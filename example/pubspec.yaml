@@ -17,7 +17,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  permission_handler: ^10.2.0
+  permission_handler: ^11.4.0
 
   http: ^0.13.4
 

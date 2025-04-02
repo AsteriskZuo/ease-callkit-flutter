@@ -15,8 +15,8 @@ import 'contact_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   assert(Config.appkey.isNotEmpty, 'must set appkey.');
-  final options = ChatCallKitOptions(
-    appKey: Config.appkey,
+  final options = ChatOptions.withAppKey(
+    Config.appkey,
     autoLogin: false,
   );
   await ChatCallKitClient.getInstance.init(options);
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> with ChatCallKitObserver {
     super.initState();
     // set agoraToken request handler.
     ChatCallKitManager.setRTCTokenHandler((channel, agoraAppId) {
-      return requestAppServerToken(channel, Random().nextInt(999999));
+      return requestRtcToken(channel, Random().nextInt(999999));
     });
 
     // set agoraUid and userId mapper handler.
@@ -207,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> with ChatCallKitObserver {
 
   void _signIn() async {
     _addLogToConsole('sign in...');
-    String? agoraToken = await fetchAgoraToken(_userId, _token);
+    String? agoraToken = await fetchAccountToken(_userId, _token);
     if (agoraToken == null) {
       _addLogToConsole('sign in fail.');
     } else {

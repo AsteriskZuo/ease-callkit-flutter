@@ -11,9 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
     
-  im_flutter_sdk: ^4.5.0
+  im_flutter_sdk: ^4.13.0
 
-  agora_rtc_engine: ^6.3.0
+  # agora_rtc_engine: ^6.3.0
+  agora_rtc_engine: ^6.5.1
 
 
 dev_dependencies:

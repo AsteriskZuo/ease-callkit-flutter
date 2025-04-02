@@ -1,47 +1,58 @@
 PODS:
-  - agora_rtc_engine (6.3.0):
-    - AgoraIrisRTC_iOS (= 4.3.0-build.2)
-    - AgoraRtcEngine_iOS (= 4.3.0)
+  - agora_rtc_engine (6.5.1):
+    - AgoraIrisRTC_iOS (= 4.5.1-build.1)
+    - AgoraRtcEngine_iOS (= 4.5.1)
     - Flutter
-  - AgoraIrisRTC_iOS (4.3.0-build.2)
-  - AgoraRtcEngine_iOS (4.3.0):
-    - AgoraRtcEngine_iOS/AIAEC (= 4.3.0)
-    - AgoraRtcEngine_iOS/AINS (= 4.3.0)
-    - AgoraRtcEngine_iOS/AudioBeauty (= 4.3.0)
-    - AgoraRtcEngine_iOS/ClearVision (= 4.3.0)
-    - AgoraRtcEngine_iOS/ContentInspect (= 4.3.0)
-    - AgoraRtcEngine_iOS/FaceCapture (= 4.3.0)
-    - AgoraRtcEngine_iOS/FaceDetection (= 4.3.0)
-    - AgoraRtcEngine_iOS/ReplayKit (= 4.3.0)
-    - AgoraRtcEngine_iOS/RtcBasic (= 4.3.0)
-    - AgoraRtcEngine_iOS/SpatialAudio (= 4.3.0)
-    - AgoraRtcEngine_iOS/VideoAv1CodecDec (= 4.3.0)
-    - AgoraRtcEngine_iOS/VideoCodecDec (= 4.3.0)
-    - AgoraRtcEngine_iOS/VideoCodecEnc (= 4.3.0)
-    - AgoraRtcEngine_iOS/VirtualBackground (= 4.3.0)
-    - AgoraRtcEngine_iOS/VQA (= 4.3.0)
-  - AgoraRtcEngine_iOS/AIAEC (4.3.0)
-  - AgoraRtcEngine_iOS/AINS (4.3.0)
-  - AgoraRtcEngine_iOS/AudioBeauty (4.3.0)
-  - AgoraRtcEngine_iOS/ClearVision (4.3.0)
-  - AgoraRtcEngine_iOS/ContentInspect (4.3.0)
-  - AgoraRtcEngine_iOS/FaceCapture (4.3.0)
-  - AgoraRtcEngine_iOS/FaceDetection (4.3.0)
-  - AgoraRtcEngine_iOS/ReplayKit (4.3.0)
-  - AgoraRtcEngine_iOS/RtcBasic (4.3.0)
-  - AgoraRtcEngine_iOS/SpatialAudio (4.3.0)
-  - AgoraRtcEngine_iOS/VideoAv1CodecDec (4.3.0)
-  - AgoraRtcEngine_iOS/VideoCodecDec (4.3.0)
-  - AgoraRtcEngine_iOS/VideoCodecEnc (4.3.0)
-  - AgoraRtcEngine_iOS/VirtualBackground (4.3.0)
-  - AgoraRtcEngine_iOS/VQA (4.3.0)
+  - AgoraInfra_iOS (1.2.13)
+  - AgoraIrisRTC_iOS (4.5.1-build.1)
+  - AgoraRtcEngine_iOS (4.5.1):
+    - AgoraRtcEngine_iOS/AIAEC (= 4.5.1)
+    - AgoraRtcEngine_iOS/AIAECLL (= 4.5.1)
+    - AgoraRtcEngine_iOS/AINS (= 4.5.1)
+    - AgoraRtcEngine_iOS/AINSLL (= 4.5.1)
+    - AgoraRtcEngine_iOS/AudioBeauty (= 4.5.1)
+    - AgoraRtcEngine_iOS/ClearVision (= 4.5.1)
+    - AgoraRtcEngine_iOS/ContentInspect (= 4.5.1)
+    - AgoraRtcEngine_iOS/FaceCapture (= 4.5.1)
+    - AgoraRtcEngine_iOS/FaceDetection (= 4.5.1)
+    - AgoraRtcEngine_iOS/LipSync (= 4.5.1)
+    - AgoraRtcEngine_iOS/ReplayKit (= 4.5.1)
+    - AgoraRtcEngine_iOS/RtcBasic (= 4.5.1)
+    - AgoraRtcEngine_iOS/SpatialAudio (= 4.5.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecDec (= 4.5.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecEnc (= 4.5.1)
+    - AgoraRtcEngine_iOS/VideoCodecDec (= 4.5.1)
+    - AgoraRtcEngine_iOS/VideoCodecEnc (= 4.5.1)
+    - AgoraRtcEngine_iOS/VirtualBackground (= 4.5.1)
+    - AgoraRtcEngine_iOS/VQA (= 4.5.1)
+  - AgoraRtcEngine_iOS/AIAEC (4.5.1)
+  - AgoraRtcEngine_iOS/AIAECLL (4.5.1)
+  - AgoraRtcEngine_iOS/AINS (4.5.1)
+  - AgoraRtcEngine_iOS/AINSLL (4.5.1)
+  - AgoraRtcEngine_iOS/AudioBeauty (4.5.1)
+  - AgoraRtcEngine_iOS/ClearVision (4.5.1)
+  - AgoraRtcEngine_iOS/ContentInspect (4.5.1)
+  - AgoraRtcEngine_iOS/FaceCapture (4.5.1)
+  - AgoraRtcEngine_iOS/FaceDetection (4.5.1)
+  - AgoraRtcEngine_iOS/LipSync (4.5.1)
+  - AgoraRtcEngine_iOS/ReplayKit (4.5.1)
+  - AgoraRtcEngine_iOS/RtcBasic (4.5.1):
+    - AgoraInfra_iOS (= 1.2.13)
+  - AgoraRtcEngine_iOS/SpatialAudio (4.5.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecDec (4.5.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecEnc (4.5.1)
+  - AgoraRtcEngine_iOS/VideoCodecDec (4.5.1)
+  - AgoraRtcEngine_iOS/VideoCodecEnc (4.5.1)
+  - AgoraRtcEngine_iOS/VirtualBackground (4.5.1)
+  - AgoraRtcEngine_iOS/VQA (4.5.1)
   - em_chat_callkit (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - HyphenateChat (4.2.0)
-  - im_flutter_sdk (0.0.1):
+  - HyphenateChat (4.13.0):
+    - AgoraInfra_iOS (= 1.2.13)
+  - im_flutter_sdk_ios (0.0.1):
     - Flutter
-    - HyphenateChat (= 4.2.0)
+    - HyphenateChat (= 4.13.0)
   - integration_test (0.0.1):
     - Flutter
   - iris_method_channel (0.0.1):
@@ -53,13 +64,14 @@ DEPENDENCIES:
   - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
   - em_chat_callkit (from `.symlinks/plugins/em_chat_callkit/ios`)
   - Flutter (from `Flutter`)
-  - im_flutter_sdk (from `.symlinks/plugins/im_flutter_sdk/ios`)
+  - im_flutter_sdk_ios (from `.symlinks/plugins/im_flutter_sdk_ios/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - iris_method_channel (from `.symlinks/plugins/iris_method_channel/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
 
 SPEC REPOS:
   trunk:
+    - AgoraInfra_iOS
     - AgoraIrisRTC_iOS
     - AgoraRtcEngine_iOS
     - HyphenateChat
@@ -71,8 +83,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/em_chat_callkit/ios"
   Flutter:
     :path: Flutter
-  im_flutter_sdk:
-    :path: ".symlinks/plugins/im_flutter_sdk/ios"
+  im_flutter_sdk_ios:
+    :path: ".symlinks/plugins/im_flutter_sdk_ios/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
   iris_method_channel:
@@ -81,17 +93,18 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
-  agora_rtc_engine: f737aeb9ac7fdfcfda875d0d0125eedaa09602f9
-  AgoraIrisRTC_iOS: 2caf892fa827777fe43b6ac7d12e9b42579eb865
-  AgoraRtcEngine_iOS: 267c0980c1fb97e056d05b850f8629b05b6e467a
+  agora_rtc_engine: 084c652232214b8ec39084127295e0e3856a7cb4
+  AgoraInfra_iOS: 65e11a2183ab7836258768868d06058c22701b13
+  AgoraIrisRTC_iOS: dd3d957c25be6bd2b2a5d03fe706ebe8a46909f0
+  AgoraRtcEngine_iOS: 5092a058c7b2842db39d8ca614d451af6f84969a
   em_chat_callkit: 08f67ef7c3f470991003f71ac34bf8b5eb519260
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  HyphenateChat: e43d1ec9ccf404eeb2ee7d3265cd12a4e83f0d3a
-  im_flutter_sdk: 0012f5bb4bf59284f6b5e55059f96e60eb527328
-  integration_test: 13825b8a9334a850581300559b8839134b124670
+  HyphenateChat: c2ecd32ae5328c027d8e270bdbe63c0902cfc828
+  im_flutter_sdk_ios: 989968246d61b7472044cd19c93ff2bb70194a10
+  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
   iris_method_channel: 0617c689164d8154c020c50f63ca79f92b8a7b9d
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
 
-PODFILE CHECKSUM: 6e700dec67e6deac9b1c69bb14c49a2217a12d15
+PODFILE CHECKSUM: beab77b38961de946f08660e554f80ac174dc842
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.15.2

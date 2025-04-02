@@ -12,7 +12,7 @@ import '../config.dart';
 /// Param [channel] The channel id.
 ///
 /// Param [agoraUid] The agora uid.
-Future<Map<String, int>> requestAppServerToken(
+Future<Map<String, int>> requestRtcToken(
   String channel,
   int agoraUid,
 ) async {
@@ -30,7 +30,8 @@ Future<Map<String, int>> requestAppServerToken(
     "userAccount": userId,
   };
 
-  String unencodedPath = '${Config.appServerTokenURL}/$channel/agorauid/$agoraUid';
+  String unencodedPath =
+      '${Config.appServerRTCTokenURL}/$channel/agorauid/$agoraUid';
 
   var uri = Uri.https(
     Config.appServerDomain,
@@ -41,7 +42,10 @@ Future<Map<String, int>> requestAppServerToken(
   var client = http.Client();
   var response = await client.get(
     uri,
-    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $accessToken'},
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    },
   );
 
   Map<String, dynamic>? map = convert.jsonDecode(response.body);
@@ -84,7 +88,10 @@ Future<ChatCallKitUserMapper?> requestAppServerUserMapper(
   var client = http.Client();
   var response = await client.get(
     uri,
-    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $accessToken'},
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken'
+    },
   );
   ChatCallKitUserMapper? ret;
   Map<String, dynamic>? map = convert.jsonDecode(response.body);
@@ -134,14 +141,14 @@ Future<String?> registerAccount(String userId, String password) async {
 }
 
 /// Obtain a agora token using the userId and password, You are required to provide your own registration service.
-Future<String?> fetchAgoraToken(String userId, String password) async {
+Future<String?> fetchAccountToken(String userId, String password) async {
   Map<String, String> params = {};
   params["userAccount"] = userId;
   params["userPassword"] = password;
 
   var uri = Uri.https(
     Config.appServerDomain,
-    Config.appServerGetAgoraToken,
+    Config.appServerGetToken,
   );
 
   var client = http.Client();
