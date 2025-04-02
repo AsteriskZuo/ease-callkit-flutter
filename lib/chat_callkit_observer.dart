@@ -42,7 +42,8 @@ abstract mixin class ChatCallKitObserver {
 
   /// Callback when the user rejects the call or the call times out.
 
-  void onUserRemoved(String callId, String userId, ChatCallKitCallEndReason reason) {}
+  void onUserRemoved(
+      String callId, String userId, ChatCallKitCallEndReason reason) {}
 
   /// Callback when the call is answered.
 

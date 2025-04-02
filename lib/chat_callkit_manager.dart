@@ -19,7 +19,8 @@ class ChatCallKitManager {
     ChatCallKitCallType type = ChatCallKitCallType.audio_1v1,
     Map<String, String>? ext,
   }) {
-    return _impl.startSingleCall(userId, type: type, ext: ext, inviteMessage: inviteMessage);
+    return _impl.startSingleCall(userId,
+        type: type, ext: ext, inviteMessage: inviteMessage);
   }
 
   /// Initiate a multi-party call invitation.

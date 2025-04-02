@@ -33,7 +33,8 @@ String kExt = "ext";
 
 class AgoraChatEventHandler {
   final void Function(ChatCallKitError error) onError;
-  final void Function(String callId, ChatCallKitCallEndReason reason) onCallEndReason;
+  final void Function(String callId, ChatCallKitCallEndReason reason)
+      onCallEndReason;
   final VoidCallback onCallAccept;
   final void Function(
     String callId,
@@ -164,7 +165,8 @@ class AgoraChatManager {
       // 发送应答
       sendAlertMsgToCaller(from, callId, callerDevId);
       // 启动应答计时器
-      alertTimerDic[callId] = Timer.periodic(const Duration(seconds: 5), (timer) {
+      alertTimerDic[callId] =
+          Timer.periodic(const Duration(seconds: 5), (timer) {
         // 时间到，取消应答计时
         timer.cancel();
         alertTimerDic.remove(callId);
@@ -227,7 +229,8 @@ class AgoraChatManager {
       if (model.curCall?.callId == callId) {
         confirmTimer?.cancel();
         confirmTimer = null;
-        handler.onCallEndReason.call(model.curCall!.callId, ChatCallKitCallEndReason.remoteCancel);
+        handler.onCallEndReason
+            .call(model.curCall!.callId, ChatCallKitCallEndReason.remoteCancel);
         model.state = ChatCallKitCallState.idle;
       } else {
         model.recvCalls.remove(callId);
@@ -266,7 +269,9 @@ class AgoraChatManager {
             } else {
               handler.onCallEndReason.call(
                 model.curCall!.callId,
-                result == kRefuseResult ? ChatCallKitCallEndReason.refuse : ChatCallKitCallEndReason.busy,
+                result == kRefuseResult
+                    ? ChatCallKitCallEndReason.refuse
+                    : ChatCallKitCallEndReason.busy,
               );
               model.state = ChatCallKitCallState.idle;
             }
@@ -279,7 +284,8 @@ class AgoraChatManager {
     }
 
     void parseConfirmCalleeMsgExt() {
-      if (model.state == ChatCallKitCallState.alerting && model.curCall?.callId == callId) {
+      if (model.state == ChatCallKitCallState.alerting &&
+          model.curCall?.callId == callId) {
         confirmTimer?.cancel();
         confirmTimer = null;
         if (model.curDevId == calleeDevId) {
@@ -294,7 +300,8 @@ class AgoraChatManager {
             // 此处要开始获取声网token。
           } else {
             model.state = ChatCallKitCallState.idle;
-            handler.onCallEndReason.call(model.curCall!.callId, ChatCallKitCallEndReason.handleOnOtherDevice);
+            handler.onCallEndReason.call(model.curCall!.callId,
+                ChatCallKitCallEndReason.handleOnOtherDevice);
           }
         }
       } else {
@@ -364,7 +371,8 @@ class AgoraChatManager {
     chatLog("sendInviteMsgToCallee", msg);
   }
 
-  void sendAlertMsgToCaller(String callerId, String callId, String devId) async {
+  void sendAlertMsgToCaller(
+      String callerId, String callId, String devId) async {
     ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
       targetId: callerId,
       action: "rtcCall",
@@ -383,7 +391,8 @@ class AgoraChatManager {
     chatLog("sendAlertMsgToCaller", msg);
   }
 
-  void sendConfirmRingMsgToCallee(String userId, String callId, bool isValid, String calleeDevId) {
+  void sendConfirmRingMsgToCallee(
+      String userId, String callId, bool isValid, String calleeDevId) {
     ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
       targetId: userId,
       action: "rtcCall",
@@ -404,8 +413,10 @@ class AgoraChatManager {
     chatLog("sendConfirmRingMsgToCallee", msg);
   }
 
-  void sendAnswerMsg(String remoteUserId, String callId, String result, String devId) async {
-    ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(targetId: remoteUserId, action: "rtcCall");
+  void sendAnswerMsg(
+      String remoteUserId, String callId, String result, String devId) async {
+    ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
+        targetId: remoteUserId, action: "rtcCall");
     Map<String, dynamic> attributes = {
       kMsgType: kMsgTypeValue,
       kAction: kAnswerCallAction,
@@ -426,7 +437,8 @@ class AgoraChatManager {
     chatLog("sendAnswerMsg", msg);
   }
 
-  void sendConfirmAnswerMsgToCallee(String userId, String callId, String result, String devId) async {
+  void sendConfirmAnswerMsgToCallee(
+      String userId, String callId, String result, String devId) async {
     ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
       targetId: userId,
       action: "rtcCall",
@@ -447,7 +459,8 @@ class AgoraChatManager {
   }
 
   void sendCancelCallMsgToCallee(String userId, String callId) {
-    final msg = ChatCallKitMessage.createCmdSendMessage(targetId: userId, action: 'rtcCall');
+    final msg = ChatCallKitMessage.createCmdSendMessage(
+        targetId: userId, action: 'rtcCall');
     msg.attributes = {
       kMsgType: kMsgTypeValue,
       kAction: kCancelCallAction,
@@ -524,10 +537,12 @@ class AgoraChatManager {
     Map<String, String>? ext,
   }) async {
     if (userId.isEmpty) {
-      throw ChatCallKitError.process(ChatCallKitErrorProcessCode.invalidParam, 'Require remote userId');
+      throw ChatCallKitError.process(
+          ChatCallKitErrorProcessCode.invalidParam, 'Require remote userId');
     }
     if (busy) {
-      throw ChatCallKitError.process(ChatCallKitErrorProcessCode.busy, 'Current is busy');
+      throw ChatCallKitError.process(
+          ChatCallKitErrorProcessCode.busy, 'Current is busy');
     }
     model.curCall = ChatCallKitCall(
       callId: ChatCallKitTools.randomStr,
@@ -558,7 +573,8 @@ class AgoraChatManager {
           if (model.curCall != null) {
             sendCancelCallMsgToCallee(userId, model.curCall!.callId);
             if (model.curCall!.callType != ChatCallKitCallType.multi) {
-              handler.onCallEndReason(model.curCall!.callId, ChatCallKitCallEndReason.remoteNoResponse);
+              handler.onCallEndReason(model.curCall!.callId,
+                  ChatCallKitCallEndReason.remoteNoResponse);
               model.state = ChatCallKitCallState.idle;
             }
           }
@@ -587,7 +603,8 @@ class AgoraChatManager {
     Map<String, String>? ext,
   ) async {
     if (userIds.isEmpty) {
-      throw ChatCallKitError.process(ChatCallKitErrorProcessCode.invalidParam, 'Require remote userId');
+      throw ChatCallKitError.process(
+          ChatCallKitErrorProcessCode.invalidParam, 'Require remote userId');
     }
 
     if (model.curCall != null) {

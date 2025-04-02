@@ -157,7 +157,9 @@ class ChatCallKitManagerImpl {
 
   Future<void> fetchToken() async {
     if (_chat.model.hasJoined) return;
-    if (_chat.model.curCall == null || _rtc.agoraAppId == null || rtcTokenHandler == null) return;
+    if (_chat.model.curCall == null ||
+        _rtc.agoraAppId == null ||
+        rtcTokenHandler == null) return;
 
     Map<String, int> agoraToken = await rtcTokenHandler!.call(
       _chat.model.curCall!.channel,
@@ -165,7 +167,8 @@ class ChatCallKitManagerImpl {
     );
 
     if (agoraToken.isEmpty) {
-      throw ChatCallKitError.process(ChatCallKitErrorProcessCode.fetchTokenFail, 'fetch token fail');
+      throw ChatCallKitError.process(
+          ChatCallKitErrorProcessCode.fetchTokenFail, 'fetch token fail');
     }
 
     if (_chat.model.curCall == null) {}
@@ -193,9 +196,12 @@ extension ChatEvent on ChatCallKitManagerImpl {
       return null;
     }
 
-    ChatCallKitUserMapper? mapper = await userMapperHandler?.call(_chat.model.curCall!.channel, agoraUid);
+    ChatCallKitUserMapper? mapper =
+        await userMapperHandler?.call(_chat.model.curCall!.channel, agoraUid);
 
-    if (_chat.model.curCall != null && mapper != null && mapper.channel == _chat.model.curCall!.channel) {
+    if (_chat.model.curCall != null &&
+        mapper != null &&
+        mapper.channel == _chat.model.curCall!.channel) {
       if (_chat.model.curCall!.channel != mapper.channel) return null;
 
       _chat.model.curCall!.allUserAccounts.addAll(mapper.infoMapper);
@@ -204,7 +210,8 @@ extension ChatEvent on ChatCallKitManagerImpl {
     return mapper;
   }
 
-  void stateChanged(ChatCallKitCallState newState, ChatCallKitCallState preState) async {
+  void stateChanged(
+      ChatCallKitCallState newState, ChatCallKitCallState preState) async {
     switch (newState) {
       case ChatCallKitCallState.idle:
         {
@@ -231,7 +238,8 @@ extension ChatEvent on ChatCallKitManagerImpl {
           if (_chat.model.curCall == null) return;
           await _rtc.initEngine();
           if (_chat.model.curCall != null) {
-            if (_chat.model.curCall!.callType != ChatCallKitCallType.audio_1v1) {
+            if (_chat.model.curCall!.callType !=
+                ChatCallKitCallType.audio_1v1) {
               await _rtc.enableVideo();
               await _rtc.startPreview();
             }
@@ -250,7 +258,8 @@ extension ChatEvent on ChatCallKitManagerImpl {
       case ChatCallKitCallState.answering:
         {
           if (_chat.model.curCall == null) return;
-          if (_chat.model.curCall!.callType == ChatCallKitCallType.multi && _chat.model.curCall!.isCaller) {
+          if (_chat.model.curCall!.callType == ChatCallKitCallType.multi &&
+              _chat.model.curCall!.isCaller) {
             // 多人主叫时，需要开启摄像头
             await _rtc.enableVideo();
             await _rtc.startPreview();
@@ -291,7 +300,8 @@ extension ChatEvent on ChatCallKitManagerImpl {
     }
   }
 
-  void onUserRemoved(String callId, String userId, ChatCallKitCallEndReason reason) {
+  void onUserRemoved(
+      String callId, String userId, ChatCallKitCallEndReason reason) {
     for (var value in handlers) {
       value.onUserRemoved.call(callId, userId, reason);
     }
@@ -323,7 +333,9 @@ extension RTCEvent on ChatCallKitManagerImpl {
           _chat.callTimerDic.remove(value)?.cancel();
         });
       } else {
-        _chat.callTimerDic.remove(_chat.model.curCall!.remoteUserAccount)?.cancel();
+        _chat.callTimerDic
+            .remove(_chat.model.curCall!.remoteUserAccount)
+            ?.cancel();
       }
 
       for (var value in handlers) {
@@ -341,7 +353,8 @@ extension RTCEvent on ChatCallKitManagerImpl {
       if (_chat.model.curCall!.callType != ChatCallKitCallType.multi) {
         if (_chat.model.curCall != null) {
           for (var value in handlers) {
-            value.onCallEnd.call(_chat.model.curCall!.callId, ChatCallKitCallEndReason.hangup);
+            value.onCallEnd.call(
+                _chat.model.curCall!.callId, ChatCallKitCallEndReason.hangup);
           }
         }
 
@@ -375,7 +388,8 @@ extension RTCEvent on ChatCallKitManagerImpl {
     // }
   }
 
-  void onRemoteVideoStateChanged(int remoteUid, RemoteVideoState state, RemoteVideoStateReason reason) {}
+  void onRemoteVideoStateChanged(
+      int remoteUid, RemoteVideoState state, RemoteVideoStateReason reason) {}
 
   void onActiveSpeaker(int uid) {
     // String? userId = _chat.model.curCall!.allUserAccounts[uid];
@@ -394,20 +408,22 @@ extension RTCEvent on ChatCallKitManagerImpl {
         } else if (err == ErrorCodeType.errInvalidToken) {
           value.onError.call(ChatCallKitError.rtc(err.index, "Invalid token"));
         } else {
-          value.onError.call(
-              ChatCallKitError.rtc(err.index, "General error with no classified reason. Try calling the method again"));
+          value.onError.call(ChatCallKitError.rtc(err.index,
+              "General error with no classified reason. Try calling the method again"));
         }
       }
     } else {
       if (err == ErrorCodeType.errFailed) {
         for (var value in handlers) {
-          value.onError.call(ChatCallKitError.rtc(ChatCallKitErrorProcessCode.general,
+          value.onError.call(ChatCallKitError.rtc(
+              ChatCallKitErrorProcessCode.general,
               "General error with no classified reason. Try calling the method again"));
         }
       }
 
       for (var value in handlers) {
-        value.onCallEnd.call(_chat.model.curCall?.callId, ChatCallKitCallEndReason.err);
+        value.onCallEnd
+            .call(_chat.model.curCall?.callId, ChatCallKitCallEndReason.err);
       }
     }
     _chat.clearInfo();

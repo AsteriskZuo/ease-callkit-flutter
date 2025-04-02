@@ -44,8 +44,11 @@ class RTCEventHandler {
   final void Function(int userId)? onUserLeaved;
   final void Function(int remoteUid, bool muted)? onUserMuteVideo;
   final void Function(int remoteUid, bool muted)? onUserMuteAudio;
-  final void Function(int remoteUid, int width, int height)? onFirstRemoteVideoDecoded;
-  final void Function(int remoteUid, RemoteVideoState state, RemoteVideoStateReason reason)? onRemoteVideoStateChanged;
+  final void Function(int remoteUid, int width, int height)?
+      onFirstRemoteVideoDecoded;
+  final void Function(
+          int remoteUid, RemoteVideoState state, RemoteVideoStateReason reason)?
+      onRemoteVideoStateChanged;
   final void Function(int uid)? onActiveSpeaker;
 }
 
@@ -65,9 +68,12 @@ class AgoraRTCManager {
       onVideoStopped: () {},
       onLocalVideoStateChanged: (source, state, error) {},
       onRemoteVideoStats: (connection, stats) {},
-      onVideoPublishStateChanged: (source, channel, oldState, newState, elapseSinceLastState) {},
-      onVideoSizeChanged: (connection, sourceType, uid, width, height, rotation) {},
-      onVideoSubscribeStateChanged: (channel, uid, oldState, newState, elapseSinceLastState) {},
+      onVideoPublishStateChanged:
+          (source, channel, oldState, newState, elapseSinceLastState) {},
+      onVideoSizeChanged:
+          (connection, sourceType, uid, width, height, rotation) {},
+      onVideoSubscribeStateChanged:
+          (channel, uid, oldState, newState, elapseSinceLastState) {},
       onError: (err, msg) {
         handler.onError?.call(ErrorCodeType.errFailed, msg);
       },
@@ -141,7 +147,8 @@ class AgoraRTCManager {
       areaCode: options?.areaCode,
     ));
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-    await _engine.setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
+    await _engine
+        .setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
     await _engine.setDefaultAudioRouteToSpeakerphone(true);
     _engine.unregisterEventHandler(_handler!);
     _engine.registerEventHandler(_handler!);
@@ -177,8 +184,8 @@ class AgoraRTCManager {
         options: const ChannelMediaOptions(),
       );
     } catch (e) {
-      handler.onError
-          ?.call(ErrorCodeType.errFailed, "General error with no classified reason. Try calling the method again");
+      handler.onError?.call(ErrorCodeType.errFailed,
+          "General error with no classified reason. Try calling the method again");
     }
   }
 
