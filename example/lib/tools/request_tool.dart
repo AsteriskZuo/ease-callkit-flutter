@@ -31,7 +31,7 @@ Future<Map<String, int>> requestRtcToken(
   };
 
   String unencodedPath =
-      '${Config.appServerRTCTokenURL}/$channel/agorauid/$agoraUid';
+      '${Config.appServerRTCTokenURL}/$channel/user/$userId';
 
   var uri = Uri.https(
     Config.appServerDomain,
@@ -50,8 +50,11 @@ Future<Map<String, int>> requestRtcToken(
 
   Map<String, dynamic>? map = convert.jsonDecode(response.body);
   if (map != null) {
-    if (map["code"] == "RES_OK") {
-      ret[map["accessToken"]] = agoraUid;
+    if (map["code"] == "RES_OK" || map["code"] == 200) {
+      int agoraUidValue = map["agoraUid"] is int 
+          ? map["agoraUid"] 
+          : int.parse(map["agoraUid"].toString());
+      ret[map["accessToken"]] = agoraUidValue;
     }
   }
 
@@ -96,7 +99,7 @@ Future<ChatCallKitUserMapper?> requestAppServerUserMapper(
   ChatCallKitUserMapper? ret;
   Map<String, dynamic>? map = convert.jsonDecode(response.body);
   if (map != null) {
-    if (map["code"] == "RES_OK") {
+    if (map["code"] == "RES_OK" || map["code"] == 200) {
       String channel = map["channelName"];
       Map result = map["result"];
       Map<int, String> mapper = {};
