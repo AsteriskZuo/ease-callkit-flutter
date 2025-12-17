@@ -1,6 +1,6 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:em_chat_callkit/chat_callkit.dart';
-import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart';
+import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart' as tools;
 import 'package:flutter/material.dart';
 
 class RTCOptions {
@@ -54,7 +54,7 @@ class RTCEventHandler {
 
 class AgoraRTCManager {
   void rtcLog(String method, ChatCallKitMessage msg) {
-    log("rtc method: $method, ${msg.toJson().toString()}");
+    tools.log("AgoraRTCManager: rtc method: $method, ${msg.toJson().toString()}");
   }
 
   AgoraRTCManager(
@@ -161,7 +161,7 @@ class AgoraRTCManager {
         await _engine.release();
         // ignore: empty_catches
       } catch (e) {
-        log("release failed");
+        tools.log("AgoraRTCManager: release failed");
       }
     }
   }
@@ -184,6 +184,7 @@ class AgoraRTCManager {
         options: const ChannelMediaOptions(),
       );
     } catch (e) {
+      tools.log("AgoraRTCManager: joinChannel failed: $e");
       handler.onError?.call(ErrorCodeType.errFailed,
           "General error with no classified reason. Try calling the method again");
     }
