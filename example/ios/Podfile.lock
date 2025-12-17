@@ -93,18 +93,18 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
-  agora_rtc_engine: 084c652232214b8ec39084127295e0e3856a7cb4
+  agora_rtc_engine: 7434787c0b5284d803c31c726562b8399b8c1744
   AgoraInfra_iOS: 65e11a2183ab7836258768868d06058c22701b13
   AgoraIrisRTC_iOS: dd3d957c25be6bd2b2a5d03fe706ebe8a46909f0
   AgoraRtcEngine_iOS: 5092a058c7b2842db39d8ca614d451af6f84969a
-  em_chat_callkit: 08f67ef7c3f470991003f71ac34bf8b5eb519260
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  em_chat_callkit: ca429d670ddcf56cee59b4e6728a958f53f8f510
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   HyphenateChat: c2ecd32ae5328c027d8e270bdbe63c0902cfc828
-  im_flutter_sdk_ios: 989968246d61b7472044cd19c93ff2bb70194a10
-  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
-  iris_method_channel: 0617c689164d8154c020c50f63ca79f92b8a7b9d
-  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
+  im_flutter_sdk_ios: 2ef02c8308382b9cfa0e436d922a4b1b6ed88be1
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  iris_method_channel: b9db2053dac3dc84e256c8792eff6f11323a53bd
+  permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
 
-PODFILE CHECKSUM: beab77b38961de946f08660e554f80ac174dc842
+PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
