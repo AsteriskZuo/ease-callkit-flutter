@@ -1,6 +1,6 @@
 name: em_chat_callkit
 description: “A set of components adapted to the chat and rtc SDK that enables quick building of video or audio calls.”
-version: 0.0.1
+version: 0.0.2
 homepage: https://www.easemob.com
 
 environment:
