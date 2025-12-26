@@ -141,34 +141,34 @@ packages:
     dependency: transitive
     description:
       name: im_flutter_sdk
-      sha256: "00d40a6666fd0b331c2a146b68dd07a8d74c1e4e09fbfb68db87ade97155618e"
+      sha256: "5f81988c5edf14a4e3868b9c47f01de2ee355e2203ae5bd95d7cacfe30e15d97"
       url: "https://pub.dev"
     source: hosted
-    version: "4.13.0+1"
+    version: "4.15.2"
   im_flutter_sdk_android:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: im_flutter_sdk_android
-      sha256: "7a2eb9aad81ee0b18996dc592a56094f3470b2f9a40551645760747308f81308"
+      sha256: ce4e01f1374a6cf20bb46f6774e1effbde5c014fd1cd3003b6604813e4fe9e71
       url: "https://pub.dev"
     source: hosted
-    version: "4.13.0+1"
+    version: "4.15.2"
   im_flutter_sdk_interface:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: im_flutter_sdk_interface
-      sha256: "990751cc02d20479d45a859a6e542252f27ebaa05d5135e2e9e928c28b32d313"
+      sha256: "08ad3ce9fc935e24272bce34aebfd9b3c3c30aab2b9e7d4b2e759acf4a4874f5"
       url: "https://pub.dev"
     source: hosted
-    version: "4.13.0+1"
+    version: "4.15.2"
   im_flutter_sdk_ios:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: im_flutter_sdk_ios
-      sha256: "4c8b5ef4df1b581d5917e3917ea4f445f908c4ac726013dcd5fbcbf2cfd5a2f6"
+      sha256: "11300c086f5821730224932c28860198ef5d879f7941f9158dddee499f7bb60e"
       url: "https://pub.dev"
     source: hosted
-    version: "4.13.0+1"
+    version: "4.15.2"
   integration_test:
     dependency: "direct dev"
     description: flutter
@@ -178,10 +178,10 @@ packages:
     dependency: transitive
     description:
       name: iris_method_channel
-      sha256: "99143ae77073ee8fd6c19d8f56ec59ba6c332000d8bea46bb9b6a89d83feca5c"
+      sha256: bfb5cfc6c6eae42da8cd1b35977a72d8b8881848a5dfc3d672e4760a907d11a0
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.2"
+    version: "2.2.4"
   js:
     dependency: transitive
     description:

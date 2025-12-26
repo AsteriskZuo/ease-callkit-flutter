@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
     
-  im_flutter_sdk: 4.13.0+1
+  im_flutter_sdk: 4.15.2
 
   # agora_rtc_engine: ^6.3.0
   agora_rtc_engine: 6.5.1
@@ -26,9 +26,9 @@ dev_dependencies:
   flutter_lints: ^3.0.0
 
 dependency_overrides:
-  im_flutter_sdk_interface: 4.13.0+1
-  im_flutter_sdk_ios: 4.13.0+1
-  im_flutter_sdk_android: 4.13.0+1
+  im_flutter_sdk_interface: 4.15.2
+  im_flutter_sdk_ios: 4.15.2
+  im_flutter_sdk_android: 4.15.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
