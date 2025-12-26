@@ -48,11 +48,11 @@ PODS:
   - em_chat_callkit (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - HyphenateChat (4.13.0):
+  - HyphenateChat (4.15.1):
     - AgoraInfra_iOS (= 1.2.13)
-  - im_flutter_sdk_ios (0.0.1):
+  - im_flutter_sdk_ios (4.15.2):
     - Flutter
-    - HyphenateChat (= 4.13.0)
+    - HyphenateChat (= 4.15.1)
   - integration_test (0.0.1):
     - Flutter
   - iris_method_channel (0.0.1):
@@ -105,13 +105,13 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_iOS: 5092a058c7b2842db39d8ca614d451af6f84969a
   em_chat_callkit: ca429d670ddcf56cee59b4e6728a958f53f8f510
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  HyphenateChat: c2ecd32ae5328c027d8e270bdbe63c0902cfc828
-  im_flutter_sdk_ios: 2ef02c8308382b9cfa0e436d922a4b1b6ed88be1
+  HyphenateChat: ec813941100d602d24e06b04b867474d634cb39d
+  im_flutter_sdk_ios: fafe8d1fc7fb81592d81a88ddcc907042117cf6c
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
-  iris_method_channel: b9db2053dac3dc84e256c8792eff6f11323a53bd
+  iris_method_channel: 7d661cf3259b3009ae423508470dbeb9374446ee
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
 
-PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
+PODFILE CHECKSUM: 05b9c1f415997b895c0ad8a560bd3a84e6432b81
 
 COCOAPODS: 1.16.2
