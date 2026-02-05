@@ -18,6 +18,7 @@ enum ChatCallKitCallEndReason {
   cancel,
   remoteCancel,
   refuse,
+  remoteRefuse,
   busy,
   remoteNoResponse,
   handleOnOtherDevice,

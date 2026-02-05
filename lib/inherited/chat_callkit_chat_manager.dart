@@ -306,7 +306,7 @@ class AgoraChatManager {
             } else {
               updateCallEndReason(
                   result == kRefuseResult
-                      ? ChatCallKitCallEndReason.refuse
+                      ? ChatCallKitCallEndReason.remoteRefuse
                       : ChatCallKitCallEndReason.busy,
                   model.curCall!.callId);
 
@@ -819,6 +819,9 @@ class AgoraChatManager {
             break;
           case ChatCallKitCallEndReason.refuse:
             reasonValue = 3;
+            break;
+          case ChatCallKitCallEndReason.remoteRefuse:
+            reasonValue = 4;
             break;
           case ChatCallKitCallEndReason.busy:
             reasonValue = 5;
