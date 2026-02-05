@@ -1,3 +1,4 @@
+import 'package:em_chat_callkit/chat_callkit.dart';
 import 'package:em_chat_callkit/chat_callkit_define.dart';
 
 class ChatCallKitCall {
@@ -11,6 +12,8 @@ class ChatCallKitCall {
     this.remoteCallDevId,
     this.agoraUid,
     this.ext,
+    this.inviteMessageId,
+    this.duration = 0,
   }) : allUserAccounts = allUserAccounts ?? {};
 
   final String callId;
@@ -22,6 +25,8 @@ class ChatCallKitCall {
   final int? agoraUid;
   Map<int, String> allUserAccounts;
   final Map<String, String>? ext;
+  final String? inviteMessageId;
+  int duration;
 
   ChatCallKitCall copyWith({
     String? callId,
@@ -32,6 +37,7 @@ class ChatCallKitCall {
     int? agoraUid,
     String? channel,
     Map<String, String>? ext,
+    String? inviteMessageId,
   }) {
     return ChatCallKitCall(
       callId: callId ?? this.callId,
@@ -43,6 +49,8 @@ class ChatCallKitCall {
       allUserAccounts: allUserAccounts,
       channel: channel ?? this.channel,
       ext: ext ?? this.ext,
+      inviteMessageId: inviteMessageId ?? this.inviteMessageId,
+      duration: duration,
     );
   }
 }

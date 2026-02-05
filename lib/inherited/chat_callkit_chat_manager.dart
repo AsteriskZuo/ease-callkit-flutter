@@ -5,7 +5,8 @@ import 'package:em_chat_callkit/chat_callkit_error.dart';
 import 'package:em_chat_callkit/inherited/chat_callkit_call.dart';
 import 'package:em_chat_callkit/inherited/chat_callkit_call_model.dart';
 import 'package:em_chat_callkit/inherited/tools/call_define.dart';
-import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart' as tools;
+import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart'
+    as tools;
 import 'package:flutter/foundation.dart';
 
 String kAction = "action";
@@ -30,10 +31,12 @@ String kAcceptResult = "accept";
 String kRefuseResult = "refuse";
 String kMsgTypeValue = "rtcCallWithAgora";
 String kExt = "ext";
+String kCallEndReason = "call_end_reason";
+String kCallDuration = "call_duration";
 
 class AgoraChatEventHandler {
   final void Function(ChatCallKitError error) onError;
-  final void Function(String callId, ChatCallKitCallEndReason reason)
+  final void Function(ChatCallKitCall curCall, ChatCallKitCallEndReason reason)
       onCallEndReason;
   final VoidCallback onCallAccept;
   final void Function(
@@ -74,7 +77,14 @@ class AgoraChatManager {
   }) {
     registerChatEvent();
     onMessageWillSend = messageWillSendHandler;
-    model = ChatCallKitCallModel(stateChanged: stateChange);
+    model = ChatCallKitCallModel(stateChanged: (newState, preState) {
+      if (newState == ChatCallKitCallState.answering) {
+        _startDurationTimer();
+      } else {
+        _stopDurationTimer();
+      }
+      stateChange(newState, preState);
+    });
   }
 
   late ChatCallKitCallModel model;
@@ -89,6 +99,7 @@ class AgoraChatManager {
   final Map<String, Timer> callTimerDic = {};
   final Map<String, Timer> alertTimerDic = {};
   Timer? ringTimer;
+  Timer? durationTimer;
 
   Timer? confirmTimer;
 
@@ -97,7 +108,8 @@ class AgoraChatManager {
   }
 
   void chatLog(String method, ChatCallKitMessage msg) {
-    tools.log("AgoraChatManager: chat method: $method, ${msg.toJson().toString()}");
+    tools.log(
+        "AgoraChatManager: chat method: $method, ${msg.toJson().toString()}");
   }
 
   void onCurrentUserJoined() {
@@ -141,14 +153,16 @@ class AgoraChatManager {
 
     // 收到邀请
     void parseInviteMsgExt() {
-      tools.log("AgoraChatManager: Receive Invite Message, parseInviteMsgExt called, callId: "
-      "callId: $callId, from: $from, callerDevId: $callerDevId, "
-      "calleeDevId: $calleeDevId, channel: $channel, isValid: $isValid, "
-      "type: $type, callExt: $callExt");
+      tools.log(
+          "AgoraChatManager: Receive Invite Message, parseInviteMsgExt called, callId: "
+          "callId: $callId, from: $from, callerDevId: $callerDevId, "
+          "calleeDevId: $calleeDevId, channel: $channel, isValid: $isValid, "
+          "type: $type, callExt: $callExt");
 
       // 已经在通话中或者呼叫中。直接返回
       if (model.curCall?.callId == callId || callTimerDic.containsKey(callId)) {
-        tools.log("AgoraChatManager: Already in call or call timer contains callId, return");
+        tools.log(
+            "AgoraChatManager: Already in call or call timer contains callId, return");
         return;
       }
       // 如果忙碌，直接返回 kBusyResult
@@ -167,9 +181,11 @@ class AgoraChatManager {
         isCaller: false,
         channel: channel,
         ext: callExt,
+        inviteMessageId: message.msgId,
       );
 
-      tools.log("AgoraChatManager: Send Alert Message to Caller, sendAlertMsgToCaller called, from: $from, callId: $callId, callerDevId: $callerDevId");
+      tools.log(
+          "AgoraChatManager: Send Alert Message to Caller, sendAlertMsgToCaller called, from: $from, callId: $callId, callerDevId: $callerDevId");
       // 发送应答
       sendAlertMsgToCaller(from, callId, callerDevId);
       // 启动应答计时器
@@ -183,7 +199,8 @@ class AgoraChatManager {
 
     // 收到邀请应答
     void parseAlertMsgExt() {
-      tools.log("AgoraChatManager: Receive Alert Message, parseAlertMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
+      tools.log(
+          "AgoraChatManager: Receive Alert Message, parseAlertMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
       // 判断是我发送的邀请收到应答
       if (model.curDevId == callerDevId) {
         // 判断应答是否与本地存储数据呼应
@@ -199,7 +216,8 @@ class AgoraChatManager {
 
     // 收到回复，可以确定通话有效，此处如果非忙可以弹窗。
     void parseConfirmRingMsgExt() {
-      tools.log("AgoraChatManager: Receive Confirm Ring Message, parseConfirmRingMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
+      tools.log(
+          "AgoraChatManager: Receive Confirm Ring Message, parseConfirmRingMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
       if (alertTimerDic.containsKey(callId) && calleeDevId == model.curDevId) {
         alertTimerDic.remove(callId)?.cancel();
         if (busy) {
@@ -210,7 +228,8 @@ class AgoraChatManager {
         if (model.recvCalls.containsKey(callId)) {
           // 验证通话有效，可以变为alerting状态, 如果无效则不需要处理
           if (isValid) {
-            tools.log("AgoraChatManager: Confirm Ring Message is valid, set model.curCall and model.state to alerting");
+            tools.log(
+                "AgoraChatManager: Confirm Ring Message is valid, set model.curCall and model.state to alerting");
             model.curCall = model.recvCalls[callId];
             model.recvCalls.clear();
             model.state = ChatCallKitCallState.alerting;
@@ -224,11 +243,10 @@ class AgoraChatManager {
             timer.cancel();
             ringTimer = null;
             if (model.curCall?.callId == callId) {
-              tools.log("AgoraChatManager: No response, call end reason: remoteNoResponse");
-              handler.onCallEndReason.call(
-                model.curCall!.callId,
-                ChatCallKitCallEndReason.remoteNoResponse,
-              );
+              tools.log(
+                  "AgoraChatManager: No response, call end reason: remoteNoResponse");
+              updateCallEndReason(ChatCallKitCallEndReason.remoteNoResponse,
+                  model.curCall!.callId);
               model.state = ChatCallKitCallState.idle;
             }
           });
@@ -238,14 +256,16 @@ class AgoraChatManager {
 
     // 收到呼叫取消
     void parseCancelCallMsgExt() {
-      tools.log("AgoraChatManager: Receive Cancel Call Message, parseCancelCallMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
+      tools.log(
+          "AgoraChatManager: Receive Cancel Call Message, parseCancelCallMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
       // 如当前已经应答，但还未加入会议，取消所以计时，并告知上层呼叫停止
       if (model.curCall?.callId == callId) {
         confirmTimer?.cancel();
         confirmTimer = null;
-        tools.log("AgoraChatManager: Cancel Call Message is valid, call end reason: remoteCancel");
-        handler.onCallEndReason
-            .call(model.curCall!.callId, ChatCallKitCallEndReason.remoteCancel);
+        tools.log(
+            "AgoraChatManager: Cancel Call Message is valid, call end reason: remoteCancel");
+        updateCallEndReason(
+            ChatCallKitCallEndReason.remoteCancel, model.curCall!.callId);
         model.state = ChatCallKitCallState.idle;
       } else {
         model.recvCalls.remove(callId);
@@ -255,7 +275,8 @@ class AgoraChatManager {
 
     // 收到结果应答
     void parseAnswerMsgExt() {
-      tools.log("AgoraChatManager: Receive Answer Message, parseAnswerMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
+      tools.log(
+          "AgoraChatManager: Receive Answer Message, parseAnswerMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
       if (model.curCall?.callId == callId && model.curDevId == callerDevId) {
         // 如果为多人模式
         if (model.curCall?.callType == ChatCallKitCallType.multi) {
@@ -283,12 +304,12 @@ class AgoraChatManager {
               ringTimer?.cancel();
               ringTimer = null;
             } else {
-              handler.onCallEndReason.call(
-                model.curCall!.callId,
-                result == kRefuseResult
-                    ? ChatCallKitCallEndReason.refuse
-                    : ChatCallKitCallEndReason.busy,
-              );
+              updateCallEndReason(
+                  result == kRefuseResult
+                      ? ChatCallKitCallEndReason.refuse
+                      : ChatCallKitCallEndReason.busy,
+                  model.curCall!.callId);
+
               model.state = ChatCallKitCallState.idle;
             }
           }
@@ -300,7 +321,8 @@ class AgoraChatManager {
     }
 
     void parseConfirmCalleeMsgExt() {
-      tools.log("AgoraChatManager: Receive Confirm Callee Message, parseConfirmCalleeMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
+      tools.log(
+          "AgoraChatManager: Receive Confirm Callee Message, parseConfirmCalleeMsgExt called, callId: $callId, from: $from, callerDevId: $callerDevId, calleeDevId: $calleeDevId");
       if (model.state == ChatCallKitCallState.alerting &&
           model.curCall?.callId == callId) {
         confirmTimer?.cancel();
@@ -317,8 +339,8 @@ class AgoraChatManager {
             // 此处要开始获取声网token。
           } else {
             model.state = ChatCallKitCallState.idle;
-            handler.onCallEndReason.call(model.curCall!.callId,
-                ChatCallKitCallEndReason.handleOnOtherDevice);
+            updateCallEndReason(ChatCallKitCallEndReason.handleOnOtherDevice,
+                model.curCall!.callId);
           }
         }
       } else {
@@ -332,7 +354,8 @@ class AgoraChatManager {
 
     if (msgType == kMsgTypeValue) {
       String action = ext[kAction];
-      tools.log("AgoraChatManager: action:-----------$action, ${ext.toString()}");
+      tools.log(
+          "AgoraChatManager: action:-----------$action, ${ext.toString()}");
       if (action == kInviteAction) {
         parseInviteMsgExt();
       } else if (action == kAlertAction) {
@@ -359,7 +382,8 @@ class AgoraChatManager {
     String? inviteMessage,
     Map<String, String>? ext,
   ) async {
-    tools.log("AgoraChatManager: Send Invite Message to Callee, sendInviteMsgToCallee called, userId: $userId, type: $type, callId: $callId, channel: $channel, inviteMessage: $inviteMessage, ext: $ext");
+    tools.log(
+        "AgoraChatManager: Send Invite Message to Callee, sendInviteMsgToCallee called, userId: $userId, type: $type, callId: $callId, channel: $channel, inviteMessage: $inviteMessage, ext: $ext");
     String sType = 'voice';
     if (type == ChatCallKitCallType.multi) {
       sType = 'conference';
@@ -386,12 +410,12 @@ class AgoraChatManager {
     msg.attributes = attr;
     onMessageWillSend?.call(msg);
     ChatCallKitClient.getInstance.chatManager.sendMessage(msg);
-    //chatLog("sendInviteMsgToCallee", msg);
   }
 
   void sendAlertMsgToCaller(
       String callerId, String callId, String devId) async {
-    tools.log("AgoraChatManager: Send Alert Message to Caller, sendAlertMsgToCaller called, callerId: $callerId, callId: $callId, devId: $devId");
+    tools.log(
+        "AgoraChatManager: Send Alert Message to Caller, sendAlertMsgToCaller called, callerId: $callerId, callId: $callId, devId: $devId");
     ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
       targetId: callerId,
       action: "rtcCall",
@@ -412,7 +436,8 @@ class AgoraChatManager {
 
   void sendConfirmRingMsgToCallee(
       String userId, String callId, bool isValid, String calleeDevId) {
-    tools.log("AgoraChatManager: Send Confirm Ring Message to Callee, sendConfirmRingMsgToCallee called, userId: $userId, callId: $callId, isValid: $isValid, calleeDevId: $calleeDevId");
+    tools.log(
+        "AgoraChatManager: Send Confirm Ring Message to Callee, sendConfirmRingMsgToCallee called, userId: $userId, callId: $callId, isValid: $isValid, calleeDevId: $calleeDevId");
     ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
       targetId: userId,
       action: "rtcCall",
@@ -435,7 +460,8 @@ class AgoraChatManager {
 
   void sendAnswerMsg(
       String remoteUserId, String callId, String result, String devId) async {
-    tools.log("AgoraChatManager: Send Answer Message to Callee, sendAnswerMsg called, remoteUserId: $remoteUserId, callId: $callId, result: $result, devId: $devId");
+    tools.log(
+        "AgoraChatManager: Send Answer Message to Callee, sendAnswerMsg called, remoteUserId: $remoteUserId, callId: $callId, result: $result, devId: $devId");
     ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
         targetId: remoteUserId, action: "rtcCall");
     Map<String, dynamic> attributes = {
@@ -460,7 +486,8 @@ class AgoraChatManager {
 
   void sendConfirmAnswerMsgToCallee(
       String userId, String callId, String result, String devId) async {
-    tools.log("AgoraChatManager: Send Confirm Answer Message to Callee, sendConfirmAnswerMsgToCallee called, userId: $userId, callId: $callId, result: $result, devId: $devId");
+    tools.log(
+        "AgoraChatManager: Send Confirm Answer Message to Callee, sendConfirmAnswerMsgToCallee called, userId: $userId, callId: $callId, result: $result, devId: $devId");
     ChatCallKitMessage msg = ChatCallKitMessage.createCmdSendMessage(
       targetId: userId,
       action: "rtcCall",
@@ -481,7 +508,8 @@ class AgoraChatManager {
   }
 
   void sendCancelCallMsgToCallee(String userId, String callId) {
-    tools.log("AgoraChatManager: Send Cancel Call Message to Callee, sendCancelCallMsgToCallee called, userId: $userId, callId: $callId");
+    tools.log(
+        "AgoraChatManager: Send Cancel Call Message to Callee, sendCancelCallMsgToCallee called, userId: $userId, callId: $callId");
     final msg = ChatCallKitMessage.createCmdSendMessage(
         targetId: userId, action: 'rtcCall');
     msg.attributes = {
@@ -513,6 +541,17 @@ class AgoraChatManager {
           onSuccess: (msgId, msg) {
             //chatLog("onSuccess", msg);
             tools.log("AgoraChatManager: onSuccess, msgId: $msgId}");
+            if (msg.attributes != null) {
+              if (msg.attributes![kMsgType] == kMsgTypeValue &&
+                  msg.attributes![kAction] == kInviteAction) {
+                String callId = msg.attributes![kCallId];
+                if (model.curCall?.callId == callId) {
+                  model.curCall = model.curCall?.copyWith(
+                    inviteMessageId: msg.msgId,
+                  );
+                }
+              }
+            }
           },
         ));
   }
@@ -530,6 +569,40 @@ class AgoraChatManager {
 
   int get ts => DateTime.now().millisecondsSinceEpoch;
 
+  void _startDurationTimer() {
+    _stopDurationTimer();
+    durationTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (model.curCall != null) {
+        model.curCall!.duration++;
+        if (model.curCall!.duration % 5 == 0) {
+          _updateCallDuration(model.curCall!.duration);
+        }
+      } else {
+        _stopDurationTimer();
+      }
+    });
+  }
+
+  void _stopDurationTimer() {
+    durationTimer?.cancel();
+    durationTimer = null;
+  }
+
+  Future<void> _updateCallDuration(int duration) async {
+    if (model.curCall != null && model.curCall!.inviteMessageId != null) {
+      ChatCallKitMessage? message = await ChatCallKitClient
+          .getInstance.chatManager
+          .loadMessage(model.curCall!.inviteMessageId!);
+      if (message == null) {
+        return;
+      }
+      Map<String, dynamic> ext = Map.from(message.attributes ?? {});
+      ext[kCallDuration] = duration;
+      message.attributes = ext;
+      await ChatCallKitClient.getInstance.chatManager.updateMessage(message);
+    }
+  }
+
   void clearAllTimer() {
     callTimerDic.forEach((key, value) {
       value.cancel();
@@ -546,6 +619,8 @@ class AgoraChatManager {
 
     ringTimer?.cancel();
     ringTimer = null;
+
+    _stopDurationTimer();
   }
 
   void dispose() {
@@ -579,7 +654,7 @@ class AgoraChatManager {
 
     model.state = ChatCallKitCallState.outgoing;
 
-    await sendInviteMsgToCallee(
+    sendInviteMsgToCallee(
       userId,
       type,
       model.curCall?.callId ?? "",
@@ -597,8 +672,8 @@ class AgoraChatManager {
           if (model.curCall != null) {
             sendCancelCallMsgToCallee(userId, model.curCall!.callId);
             if (model.curCall!.callType != ChatCallKitCallType.multi) {
-              handler.onCallEndReason(model.curCall!.callId,
-                  ChatCallKitCallEndReason.remoteNoResponse);
+              updateCallEndReason(ChatCallKitCallEndReason.remoteNoResponse,
+                  model.curCall!.callId);
               model.state = ChatCallKitCallState.idle;
             }
           }
@@ -626,7 +701,8 @@ class AgoraChatManager {
     String? inviteMessage,
     Map<String, String>? ext,
   ) async {
-    tools.log("AgoraChatManager: Start Invite Users, startInviteUsers called, userIds: $userIds, inviteMessage: $inviteMessage, ext: $ext");
+    tools.log(
+        "AgoraChatManager: Start Invite Users, startInviteUsers called, userIds: $userIds, inviteMessage: $inviteMessage, ext: $ext");
     if (userIds.isEmpty) {
       throw ChatCallKitError.process(
           ChatCallKitErrorProcessCode.invalidParam, 'Require remote userId');
@@ -694,13 +770,13 @@ class AgoraChatManager {
     if (model.curCall?.callId == callId) {
       clearAllTimer();
       if (model.state == ChatCallKitCallState.answering) {
-        handler.onCallEndReason(callId, ChatCallKitCallEndReason.hangup);
+        updateCallEndReason(ChatCallKitCallEndReason.hangup, callId);
       } else if (model.state == ChatCallKitCallState.outgoing) {
         sendCancelCallMsgToCallee(
           model.curCall!.remoteUserAccount!,
           model.curCall!.callId,
         );
-        handler.onCallEndReason(callId, ChatCallKitCallEndReason.cancel);
+        updateCallEndReason(ChatCallKitCallEndReason.cancel, callId);
       } else if (model.state == ChatCallKitCallState.alerting) {
         sendAnswerMsg(
           model.curCall!.remoteUserAccount!,
@@ -708,14 +784,72 @@ class AgoraChatManager {
           kRefuseResult,
           model.curCall!.remoteCallDevId!,
         );
-        handler.onCallEndReason(callId, ChatCallKitCallEndReason.refuse);
+        updateCallEndReason(ChatCallKitCallEndReason.refuse, callId);
       }
       model.state = ChatCallKitCallState.idle;
     }
   }
 
+  Future<void> updateCallEndReason(
+      ChatCallKitCallEndReason reason, String? callId) async {
+    ChatCallKitCall? call;
+    if (model.curCall?.callId == callId) {
+      call = model.curCall;
+    } else if (callId != null && model.recvCalls.containsKey(callId)) {
+      call = model.recvCalls[callId];
+    }
+
+    if (call != null && call.inviteMessageId != null) {
+      ChatCallKitMessage? message =
+          await ChatCallKitClient.getInstance.chatManager.loadMessage(
+        call.inviteMessageId!,
+      );
+      if (message != null) {
+        Map<String, dynamic> ext = Map.from(message.attributes ?? {});
+        int reasonValue = 0;
+        switch (reason) {
+          case ChatCallKitCallEndReason.hangup:
+            reasonValue = 0;
+            break;
+          case ChatCallKitCallEndReason.cancel:
+            reasonValue = 1;
+            break;
+          case ChatCallKitCallEndReason.remoteCancel:
+            reasonValue = 2;
+            break;
+          case ChatCallKitCallEndReason.refuse:
+            reasonValue = 3;
+            break;
+          case ChatCallKitCallEndReason.busy:
+            reasonValue = 5;
+            break;
+          case ChatCallKitCallEndReason.remoteNoResponse:
+            reasonValue = 7;
+            break;
+          case ChatCallKitCallEndReason.handleOnOtherDevice:
+            reasonValue = 8;
+            break;
+          case ChatCallKitCallEndReason.err:
+            reasonValue = 9;
+            break;
+        }
+        ext[kCallEndReason] = reasonValue;
+        if (call.duration > 0) {
+          ext[kCallDuration] = call.duration;
+        }
+        message.attributes = ext;
+        await ChatCallKitClient.getInstance.chatManager.updateMessage(message);
+        handler.onCallEndReason.call(
+          call,
+          reason,
+        );
+      }
+    }
+  }
+
   Future<void> answerCall(String callId) async {
-    tools.log("AgoraChatManager: Answer Call, answerCall called, callId: $callId");
+    tools.log(
+        "AgoraChatManager: Answer Call, answerCall called, callId: $callId");
     if (model.curCall?.callId == callId) {
       if (model.curCall!.isCaller == true) {
         return;
