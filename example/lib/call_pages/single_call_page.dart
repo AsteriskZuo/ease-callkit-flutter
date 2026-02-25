@@ -232,7 +232,7 @@ class _SingleCallPageState extends State<SingleCallPage>
   }
 
   @override
-  void onCallEnd(callId, reason) {
+  void onCallEnd(ChatCallKitCall? call, ChatCallKitCallEndReason reason) {
     Navigator.of(context).pop();
   }
 

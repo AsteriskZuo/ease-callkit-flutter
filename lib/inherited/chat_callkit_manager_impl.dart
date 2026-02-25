@@ -2,7 +2,8 @@ import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:em_chat_callkit/chat_callkit.dart';
 import 'package:em_chat_callkit/inherited/chat_callkit_chat_manager.dart';
 import 'package:em_chat_callkit/inherited/chat_callkit_rtc_manager.dart';
-import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart' as tools;
+import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart'
+    as tools;
 
 class ChatCallKitManagerImpl {
   static ChatCallKitManagerImpl? _instance;
@@ -24,8 +25,8 @@ class ChatCallKitManagerImpl {
         onCallAccept: () {
           onCallAccept();
         },
-        onCallEndReason: (callId, reason) {
-          onCallEndReason(callId, reason);
+        onCallEndReason: (call, reason) {
+          onCallEndReason(call, reason);
         },
         onError: (error) {
           onError(error);
@@ -117,7 +118,8 @@ class ChatCallKitManagerImpl {
     ChatCallKitCallType type = ChatCallKitCallType.audio_1v1,
     Map<String, String>? ext,
   }) {
-    tools.log("ChatCallKitManagerImpl: startSingleCall called, userId: $userId, type: $type, ext: $ext, inviteMessage: $inviteMessage");
+    tools.log(
+        "ChatCallKitManagerImpl: startSingleCall called, userId: $userId, type: $type, ext: $ext, inviteMessage: $inviteMessage");
     return _chat.startSingleCall(
       userId,
       inviteMessage: inviteMessage,
@@ -131,7 +133,8 @@ class ChatCallKitManagerImpl {
     String? inviteMessage,
     Map<String, String>? ext,
   ) {
-    tools.log("ChatCallKitManagerImpl: startInviteUsers called, userIds: $userIds, inviteMessage: $inviteMessage, ext: $ext");
+    tools.log(
+        "ChatCallKitManagerImpl: startInviteUsers called, userIds: $userIds, inviteMessage: $inviteMessage, ext: $ext");
     return _chat.startInviteUsers(userIds, inviteMessage, ext);
   }
 
@@ -143,6 +146,11 @@ class ChatCallKitManagerImpl {
   Future<void> hangup(String callId) async {
     tools.log("ChatCallKitManagerImpl: hangup called, callId: $callId");
     await _chat.hangup(callId);
+  }
+
+  Future<void> updateCallEndReason(
+      ChatCallKitCallEndReason reason, String? callId) async {
+    await _chat.updateCallEndReason(reason, callId);
   }
 
   Future<void> answer(String callId) async {
@@ -178,7 +186,8 @@ class ChatCallKitManagerImpl {
       _rtc.agoraAppId!,
     );
 
-    tools.log("ChatCallKitManagerImpl: fetchToken called, agoraToken: $agoraToken");
+    tools.log(
+        "ChatCallKitManagerImpl: fetchToken called, agoraToken: $agoraToken");
 
     if (agoraToken.isEmpty) {
       throw ChatCallKitError.process(
@@ -191,13 +200,11 @@ class ChatCallKitManagerImpl {
 
     if (username == null) return;
 
-    tools.log(
-      "ChatCallKitManagerImpl: joinChannel called, "
-      "callType: ${_chat.model.curCall!.callType}, "
-      "agoraToken: ${agoraToken.keys.first}, "
-      "channel: ${_chat.model.curCall!.channel}, "
-      "agoraUid: ${_chat.model.agoraUid ?? agoraToken.values.first}"
-    );
+    tools.log("ChatCallKitManagerImpl: joinChannel called, "
+        "callType: ${_chat.model.curCall!.callType}, "
+        "agoraToken: ${agoraToken.keys.first}, "
+        "channel: ${_chat.model.curCall!.channel}, "
+        "agoraUid: ${_chat.model.agoraUid ?? agoraToken.values.first}");
     await _rtc.joinChannel(
       _chat.model.curCall!.callType,
       agoraToken.keys.first,
@@ -236,14 +243,16 @@ extension ChatEvent on ChatCallKitManagerImpl {
     switch (newState) {
       case ChatCallKitCallState.idle:
         {
-          tools.log("ChatCallKitManagerImpl:stateChanged: state changed to idle");
+          tools.log(
+              "ChatCallKitManagerImpl:stateChanged: state changed to idle");
           await _chat.clearCurrentCallInfo();
           await _rtc.clearCurrentCallInfo();
         }
         break;
       case ChatCallKitCallState.outgoing:
         {
-          tools.log("ChatCallKitManagerImpl:stateChanged: state changed to outgoing");
+          tools.log(
+              "ChatCallKitManagerImpl:stateChanged: state changed to outgoing");
           if (_chat.model.curCall == null) return;
           if (_chat.model.curCall?.callType != ChatCallKitCallType.audio_1v1) {
             await _rtc.enableVideo();
@@ -258,7 +267,8 @@ extension ChatEvent on ChatCallKitManagerImpl {
         break;
       case ChatCallKitCallState.alerting:
         {
-          tools.log("ChatCallKitManagerImpl:stateChanged: state changed to alerting");
+          tools.log(
+              "ChatCallKitManagerImpl:stateChanged: state changed to alerting");
           if (_chat.model.curCall == null) return;
           await _rtc.initEngine();
           tools.log("ChatCallKitManagerImpl: initEngine called");
@@ -271,13 +281,11 @@ extension ChatEvent on ChatCallKitManagerImpl {
             }
 
             for (var value in handlers) {
-              tools.log(
-                "ChatCallKitManagerImpl: onReceiveCall called, "
-                "remoteUserAccount: ${_chat.model.curCall!.remoteUserAccount}, "
-                "callId: ${_chat.model.curCall!.callId}, "
-                "callType: ${_chat.model.curCall!.callType}, "
-                "ext: ${_chat.model.curCall!.ext}"
-              );
+              tools.log("ChatCallKitManagerImpl: onReceiveCall called, "
+                  "remoteUserAccount: ${_chat.model.curCall!.remoteUserAccount}, "
+                  "callId: ${_chat.model.curCall!.callId}, "
+                  "callType: ${_chat.model.curCall!.callType}, "
+                  "ext: ${_chat.model.curCall!.ext}");
               value.onReceiveCall.call(
                 _chat.model.curCall!.remoteUserAccount!,
                 _chat.model.curCall!.callId,
@@ -290,7 +298,8 @@ extension ChatEvent on ChatCallKitManagerImpl {
         break;
       case ChatCallKitCallState.answering:
         {
-          tools.log("ChatCallKitManagerImpl:stateChanged: state changed to answering");
+          tools.log(
+              "ChatCallKitManagerImpl:stateChanged: state changed to answering");
           if (_chat.model.curCall == null) return;
           if (_chat.model.curCall!.callType == ChatCallKitCallType.multi &&
               _chat.model.curCall!.isCaller) {
@@ -319,10 +328,12 @@ extension ChatEvent on ChatCallKitManagerImpl {
     }
   }
 
-  void onCallEndReason(String callId, ChatCallKitCallEndReason reason) {
-    tools.log("ChatCallKitManagerImpl: onCallEndReason called, callId: $callId, reason: $reason");
+  void onCallEndReason(
+      ChatCallKitCall curCall, ChatCallKitCallEndReason reason) {
+    tools.log(
+        "ChatCallKitManagerImpl: onCallEndReason called, callId: ${curCall.callId}, reason: $reason");
     for (var value in handlers) {
-      value.onCallEnd.call(callId, reason);
+      value.onCallEnd.call(curCall, reason);
     }
   }
 
@@ -342,7 +353,8 @@ extension ChatEvent on ChatCallKitManagerImpl {
 
   void onUserRemoved(
       String callId, String userId, ChatCallKitCallEndReason reason) {
-    tools.log("ChatCallKitManagerImpl: onUserRemoved called, callId: $callId, userId: $userId, reason: $reason");
+    tools.log(
+        "ChatCallKitManagerImpl: onUserRemoved called, callId: $callId, userId: $userId, reason: $reason");
     for (var value in handlers) {
       value.onUserRemoved.call(callId, userId, reason);
     }
@@ -362,7 +374,8 @@ extension RTCEvent on ChatCallKitManagerImpl {
 
     if (_chat.model.curCall != null) {
       String channel = _chat.model.curCall!.channel;
-      tools.log("ChatCallKitManagerImpl: onJoinedChannel called, channel: $channel");
+      tools.log(
+          "ChatCallKitManagerImpl: onJoinedChannel called, channel: $channel");
 
       for (var value in handlers) {
         value.onJoinedChannel.call(channel);
@@ -376,7 +389,8 @@ extension RTCEvent on ChatCallKitManagerImpl {
   }
 
   void onUserJoined(int remoteUid) async {
-    tools.log("ChatCallKitManagerImpl: onUserJoined called, remoteUid: $remoteUid");
+    tools.log(
+        "ChatCallKitManagerImpl: onUserJoined called, remoteUid: $remoteUid");
     ChatCallKitUserMapper? mapper = await updateUserMapper(remoteUid);
     if (_chat.model.curCall != null) {
       if (_chat.model.curCall?.callType == ChatCallKitCallType.multi) {
@@ -395,28 +409,25 @@ extension RTCEvent on ChatCallKitManagerImpl {
     }
   }
 
-  void onUserLeaved(int remoteUid) {
-    tools.log("ChatCallKitManagerImpl: onUserLeaved called, remoteUid: $remoteUid");
+  void onUserLeaved(int remoteUid) async {
+    tools.log(
+        "ChatCallKitManagerImpl: onUserLeaved called, remoteUid: $remoteUid");
     if (_chat.model.curCall != null) {
       String? userId = _chat.model.curCall?.allUserAccounts.remove(remoteUid);
       for (var value in handlers) {
         value.onUserLeaved.call(remoteUid, userId);
       }
       if (_chat.model.curCall!.callType != ChatCallKitCallType.multi) {
-        if (_chat.model.curCall != null) {
-          for (var value in handlers) {
-            value.onCallEnd.call(
-                _chat.model.curCall!.callId, ChatCallKitCallEndReason.hangup);
-          }
-        }
-
+        await _chat.updateCallEndReason(
+            ChatCallKitCallEndReason.hangup, _chat.model.curCall!.callId);
         _chat.clearInfo();
       }
     }
   }
 
   void onUserMuteVideo(int remoteUid, bool muted) {
-    tools.log("ChatCallKitManagerImpl: onUserMuteVideo called, remoteUid: $remoteUid, muted: $muted");
+    tools.log(
+        "ChatCallKitManagerImpl: onUserMuteVideo called, remoteUid: $remoteUid, muted: $muted");
     if (_chat.model.curCall != null) {
       for (var value in handlers) {
         value.onUserMuteVideo.call(remoteUid, muted);
@@ -425,7 +436,8 @@ extension RTCEvent on ChatCallKitManagerImpl {
   }
 
   void onUserMuteAudio(int remoteUid, bool muted) {
-    tools.log("ChatCallKitManagerImpl: onUserMuteAudio called, remoteUid: $remoteUid, muted: $muted");
+    tools.log(
+        "ChatCallKitManagerImpl: onUserMuteAudio called, remoteUid: $remoteUid, muted: $muted");
     if (_chat.model.curCall != null) {
       for (var value in handlers) {
         value.onUserMuteAudio.call(remoteUid, muted);
@@ -452,8 +464,9 @@ extension RTCEvent on ChatCallKitManagerImpl {
     // });
   }
 
-  void onRTCError(ErrorCodeType err, String desc) {
-    tools.log("ChatCallKitManagerImpl: onRTCError called, err: $err, desc: $desc");
+  void onRTCError(ErrorCodeType err, String desc) async {
+    tools.log(
+        "ChatCallKitManagerImpl: onRTCError called, err: $err, desc: $desc");
     if (err == ErrorCodeType.errTokenExpired ||
         err == ErrorCodeType.errInvalidToken ||
         err == ErrorCodeType.errFailed) {
@@ -477,8 +490,7 @@ extension RTCEvent on ChatCallKitManagerImpl {
       }
 
       for (var value in handlers) {
-        value.onCallEnd
-            .call(_chat.model.curCall?.callId, ChatCallKitCallEndReason.err);
+        value.onCallEnd.call(_chat.model.curCall, ChatCallKitCallEndReason.err);
       }
     }
     _chat.clearInfo();

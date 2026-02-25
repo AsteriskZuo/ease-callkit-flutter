@@ -1,4 +1,5 @@
 import 'package:em_chat_callkit/chat_callkit.dart';
+import 'package:em_chat_callkit/inherited/chat_callkit_call.dart';
 
 abstract mixin class ChatCallKitObserver {
   /// Callback when the call fails, See [ChatCallKitError].
@@ -7,7 +8,7 @@ abstract mixin class ChatCallKitObserver {
 
   /// Callback when the call ends, See [ChatCallKitCallEndReason].
 
-  void onCallEnd(String? callId, ChatCallKitCallEndReason reason) {}
+  void onCallEnd(ChatCallKitCall? call, ChatCallKitCallEndReason reason) {}
 
   /// Callback when you receive a call invitation.
 
