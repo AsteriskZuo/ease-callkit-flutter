@@ -85,7 +85,8 @@ class ChatCallKitLogger {
     }
 
     // 拼接日志内容（时间戳 + 标签 + 内容）
-    final String logWithMeta = '[${_formatDateTime(DateTime.now())}] [$tag] $content\n';
+    final String logWithMeta =
+        '[${_formatDateTime(DateTime.now())}] [$tag] $content\n';
 
     // 使用 RandomAccessFile 追加写入并立即刷新到磁盘
     RandomAccessFile? raf;
@@ -103,18 +104,11 @@ class ChatCallKitLogger {
 
   /// 内部方法：获取主日志文件（按日期命名，每天一个）
   Future<File> _getMainLogFile() async {
-    // 获取应用私有存储目录（Android/iOS 兼容）
-    // Android: /data/data/包名/app_flutter/
-    // iOS: /Library/Application Support/
-    final Directory appDir = await getApplicationSupportDirectory();
-
-    // 确保目录存在（递归创建）
-    if (!await appDir.exists()) {
-      await appDir.create(recursive: true);
-    }
+    final Directory appDir = await _getLogDirectory();
 
     // 按日期生成主日志文件名（格式：20251218_chatcallkit.log）
-    final String dateStr = DateTime.now().toString().split(' ')[0].replaceAll('-', '');
+    final String dateStr =
+        DateTime.now().toString().split(' ')[0].replaceAll('-', '');
     final String logFileName = '${dateStr}_$_logFilePrefix.log';
     final File logFile = File('${appDir.path}/$logFileName');
 
@@ -124,6 +118,30 @@ class ChatCallKitLogger {
     }
 
     return logFile;
+  }
+
+  /// 内部方法：获取日志目录。
+  /// Android: /storage/emulated/0/Android/data/包名/files/core_log/
+  /// iOS: /Library/Application Support/
+  Future<Directory> _getLogDirectory() async {
+    Directory appDir;
+
+    if (Platform.isAndroid) {
+      final Directory? externalDir = await getExternalStorageDirectory();
+      if (externalDir != null) {
+        appDir = Directory('${externalDir.path}/core_log');
+      } else {
+        appDir = await getApplicationSupportDirectory();
+      }
+    } else {
+      appDir = await getApplicationSupportDirectory();
+    }
+
+    if (!await appDir.exists()) {
+      await appDir.create(recursive: true);
+    }
+
+    return appDir;
   }
 
   /// 内部方法：检查文件是否超过最大大小
@@ -144,12 +162,13 @@ class ChatCallKitLogger {
 
     // 重命名旧文件（归档）
     await oldFile.rename(newFilePath);
-    developer.log('归档旧日志文件：${oldFile.path} → $newFilePath', name: 'ChatCallKit-Archive');
+    developer.log('归档旧日志文件：${oldFile.path} → $newFilePath',
+        name: 'ChatCallKit-Archive');
   }
 
   /// 内部方法：按文件数量清理旧日志（只保留最新的 N 个）
   Future<void> _cleanOldLogsByCount() async {
-    final Directory appDir = await getApplicationSupportDirectory();
+    final Directory appDir = await _getLogDirectory();
     if (!await appDir.exists()) return;
 
     // 获取当前主日志文件路径（排除，不清理）
@@ -163,7 +182,8 @@ class ChatCallKitLogger {
     );
 
     // 筛选所有需要清理的旧日志文件
-    final List<File> oldLogFiles = await appDir.list()
+    final List<File> oldLogFiles = await appDir
+        .list()
         .where((entity) =>
             entity is File &&
             // 只匹配文件名（避免路径干扰）
@@ -174,7 +194,8 @@ class ChatCallKitLogger {
         .toList();
 
     // 按文件修改时间排序（旧的在前，新的在后）
-    oldLogFiles.sort((a, b) => a.lastModifiedSync().compareTo(b.lastModifiedSync()));
+    oldLogFiles
+        .sort((a, b) => a.lastModifiedSync().compareTo(b.lastModifiedSync()));
 
     // 清理超出数量的旧文件
     while (oldLogFiles.length > _maxLogFileCount) {
@@ -191,7 +212,7 @@ class ChatCallKitLogger {
 
   /// 内部方法：按时间清理旧日志（删除超过 N 天的文件）
   Future<void> _cleanOldLogsByTime() async {
-    final Directory appDir = await getApplicationSupportDirectory();
+    final Directory appDir = await _getLogDirectory();
     if (!await appDir.exists()) return;
 
     // 获取当前主日志文件路径（排除）
@@ -199,7 +220,8 @@ class ChatCallKitLogger {
     final String mainLogPath = mainLogFile.path;
 
     // 计算过期时间（当前时间 - 保留天数）
-    final DateTime expireTime = DateTime.now().subtract(Duration(days: _maxLogRetentionDays));
+    final DateTime expireTime =
+        DateTime.now().subtract(Duration(days: _maxLogRetentionDays));
 
     // 正则匹配日志文件
     final RegExp logFileReg = RegExp(
