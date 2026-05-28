@@ -143,8 +143,13 @@ class AgoraRTCManager {
   RtcEngineEventHandler? _handler;
 
   Future<void> initEngine() async {
+    tools.log("AgoraRTCManager: in initEngine, engineHasInit: $_engineHasInit");
+    tools.log("AgoraRTCManager: in initEngine, engineInitializing: $_engineInitializing");
+
     if (_engineHasInit) return;
     if (_engineInitializing != null) return _engineInitializing;
+
+    tools.log("AgoraRTCManager: in initEngine, called");
 
     _engineInitializing = _initEngine();
     try {
@@ -152,6 +157,8 @@ class AgoraRTCManager {
     } finally {
       _engineInitializing = null;
     }
+
+    tools.log("AgoraRTCManager: in initEngine, end");
   }
 
   Future<void> _initEngine() async {
@@ -161,6 +168,7 @@ class AgoraRTCManager {
           await ChatCallKitLogger.instance.getCurrentLogFilePath();
       final String rtcLogPath =
           '${File(callkitLogPath).parent.path}/agorasdk.log';
+      tools.log("AgoraRTCManager: in _initEngine, rtc log path: $rtcLogPath");
       engine = createAgoraRtcEngine();
       await engine.initialize(RtcEngineContext(
         appId: agoraAppId,
@@ -173,19 +181,28 @@ class AgoraRTCManager {
           level: LogLevel.logLevelInfo,
         ),
       ));
-      tools.log("AgoraRTCManager: rtc log path: $rtcLogPath");
+      tools.log("AgoraRTCManager: in _initEngine, engine initialized");
+
       await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+      tools.log("AgoraRTCManager: in _initEngine, client role set");
+
       await engine
           .setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
+      tools.log("AgoraRTCManager: in _initEngine, channel profile set");
+
       await engine.setDefaultAudioRouteToSpeakerphone(true);
+      tools.log("AgoraRTCManager: in _initEngine, default audio route set to speakerphone");
+
       engine.unregisterEventHandler(_handler!);
       engine.registerEventHandler(_handler!);
+      tools.log("AgoraRTCManager: in _initEngine, event handler registered");
+
       _engine = engine;
       _engineHasInit = true;
     } on AgoraRtcException catch (e) {
       _engineHasInit = false;
       tools.log(
-        "AgoraRTCManager: initEngine failed, code: ${e.code}, message: ${e.message}",
+        "AgoraRTCManager: in _initEngine, failed, code: ${e.code}, message: ${e.message}",
       );
       try {
         await engine?.release();
@@ -193,7 +210,7 @@ class AgoraRTCManager {
       rethrow;
     } catch (e) {
       _engineHasInit = false;
-      tools.log("AgoraRTCManager: initEngine failed: $e");
+      tools.log("AgoraRTCManager: in initEngine, failed: $e");
       try {
         await engine?.release();
       } catch (_) {}
@@ -202,6 +219,8 @@ class AgoraRTCManager {
   }
 
   Future<void> releaseEngine() async {
+    tools.log("AgoraRTCManager: in releaseEngine, engineInitializing: $_engineInitializing");
+    tools.log("AgoraRTCManager: in releaseEngine, engineHasInit: $_engineHasInit");
     if (_engineInitializing != null) {
       try {
         await _engineInitializing;
@@ -210,13 +229,18 @@ class AgoraRTCManager {
       }
     }
 
+    tools.log("AgoraRTCManager: in releaseEngine, engineHasInit: $_engineHasInit");
+
     if (_engineHasInit) {
+      tools.log("AgoraRTCManager: in releaseEngine, set engineHasInit to false");
       _engineHasInit = false;
       try {
+        tools.log("AgoraRTCManager: in releaseEngine, release engine");
         await _engine.release();
+        tools.log("AgoraRTCManager: in releaseEngine, engine released");
         // ignore: empty_catches
       } catch (e) {
-        tools.log("AgoraRTCManager: release failed: $e");
+        tools.log("AgoraRTCManager: in releaseEngine, release failed: $e");
       }
     }
   }
@@ -231,6 +255,7 @@ class AgoraRTCManager {
     String channel,
     int uid,
   ) async {
+    tools.log("AgoraRTCManager: joinChannel, called");
     try {
       await _engine.joinChannel(
         token: token,
@@ -246,8 +271,13 @@ class AgoraRTCManager {
   }
 
   Future<void> leaveChannel() async {
-    if (!_engineHasInit) return;
+    tools.log("AgoraRTCManager: in leaveChannel, engineHasInit: $_engineHasInit");
+    if (!_engineHasInit) {
+      tools.log("AgoraRTCManager: in leaveChannel, engineHasInit is false, return");
+      return;
+    }
     try {
+      tools.log("AgoraRTCManager: in leaveChannel, called");
       await _engine.leaveChannel();
       // ignore: empty_catches
     } catch (e) {}
