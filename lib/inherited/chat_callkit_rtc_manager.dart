@@ -220,7 +220,6 @@ class AgoraRTCManager {
 
   Future<void> releaseEngine() async {
     tools.log("AgoraRTCManager: in releaseEngine, engineInitializing: $_engineInitializing");
-    tools.log("AgoraRTCManager: in releaseEngine, engineHasInit: $_engineHasInit");
     if (_engineInitializing != null) {
       try {
         await _engineInitializing;
