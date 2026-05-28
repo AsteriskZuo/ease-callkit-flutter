@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:em_chat_callkit/chat_callkit.dart';
-import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart' as tools;
+import 'package:em_chat_callkit/inherited/tools/chat_callkit_log.dart';
+import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart'
+    as tools;
 import 'package:flutter/material.dart';
 
 class RTCOptions {
@@ -54,7 +58,8 @@ class RTCEventHandler {
 
 class AgoraRTCManager {
   void rtcLog(String method, ChatCallKitMessage msg) {
-    tools.log("AgoraRTCManager: rtc method: $method, ${msg.toJson().toString()}");
+    tools.log(
+        "AgoraRTCManager: rtc method: $method, ${msg.toJson().toString()}");
   }
 
   AgoraRTCManager(
@@ -130,6 +135,7 @@ class AgoraRTCManager {
     );
   }
   bool _engineHasInit = false;
+  Future<void>? _engineInitializing;
   RTCOptions? options;
   String? agoraAppId;
   late RtcEngine _engine;
@@ -138,30 +144,79 @@ class AgoraRTCManager {
 
   Future<void> initEngine() async {
     if (_engineHasInit) return;
-    _engineHasInit = true;
-    _engine = createAgoraRtcEngine();
-    await _engine.initialize(RtcEngineContext(
-      appId: agoraAppId,
-      audioScenario: options?.audioScenarioType,
-      channelProfile: options?.channelProfile,
-      areaCode: options?.areaCode,
-    ));
-    await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-    await _engine
-        .setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
-    await _engine.setDefaultAudioRouteToSpeakerphone(true);
-    _engine.unregisterEventHandler(_handler!);
-    _engine.registerEventHandler(_handler!);
+    if (_engineInitializing != null) return _engineInitializing;
+
+    _engineInitializing = _initEngine();
+    try {
+      await _engineInitializing;
+    } finally {
+      _engineInitializing = null;
+    }
+  }
+
+  Future<void> _initEngine() async {
+    RtcEngine? engine;
+    try {
+      final String callkitLogPath =
+          await ChatCallKitLogger.instance.getCurrentLogFilePath();
+      final String rtcLogPath =
+          '${File(callkitLogPath).parent.path}/agorasdk.log';
+      engine = createAgoraRtcEngine();
+      await engine.initialize(RtcEngineContext(
+        appId: agoraAppId,
+        audioScenario: options?.audioScenarioType,
+        channelProfile: options?.channelProfile,
+        areaCode: options?.areaCode,
+        logConfig: LogConfig(
+          filePath: rtcLogPath,
+          fileSizeInKB: defaultLogSizeInKb,
+          level: LogLevel.logLevelInfo,
+        ),
+      ));
+      tools.log("AgoraRTCManager: rtc log path: $rtcLogPath");
+      await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+      await engine
+          .setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
+      await engine.setDefaultAudioRouteToSpeakerphone(true);
+      engine.unregisterEventHandler(_handler!);
+      engine.registerEventHandler(_handler!);
+      _engine = engine;
+      _engineHasInit = true;
+    } on AgoraRtcException catch (e) {
+      _engineHasInit = false;
+      tools.log(
+        "AgoraRTCManager: initEngine failed, code: ${e.code}, message: ${e.message}",
+      );
+      try {
+        await engine?.release();
+      } catch (_) {}
+      rethrow;
+    } catch (e) {
+      _engineHasInit = false;
+      tools.log("AgoraRTCManager: initEngine failed: $e");
+      try {
+        await engine?.release();
+      } catch (_) {}
+      rethrow;
+    }
   }
 
   Future<void> releaseEngine() async {
+    if (_engineInitializing != null) {
+      try {
+        await _engineInitializing;
+      } catch (_) {
+        return;
+      }
+    }
+
     if (_engineHasInit) {
       _engineHasInit = false;
       try {
         await _engine.release();
         // ignore: empty_catches
       } catch (e) {
-        tools.log("AgoraRTCManager: release failed");
+        tools.log("AgoraRTCManager: release failed: $e");
       }
     }
   }
