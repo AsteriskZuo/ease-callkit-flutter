@@ -37,7 +37,9 @@ class _ContactPageState extends State<ContactPage> {
                   if (selectedUsers.isNotEmpty) {
                     text += "(${selectedUsers.length})";
                   }
-                  return Text(text, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14));
+                  return Text(text,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 14));
                 }),
               ),
             ),
@@ -83,7 +85,8 @@ class _ContactPageState extends State<ContactPage> {
                     alignment: Alignment.center,
                     child: Text(
                       userId,
-                      style: TextStyle(color: selected ? Colors.white : Colors.black),
+                      style: TextStyle(
+                          color: selected ? Colors.white : Colors.black),
                     ),
                   ),
                 ),
@@ -95,7 +98,8 @@ class _ContactPageState extends State<ContactPage> {
 
   Future<void> refresh() async {
     try {
-      List<String> list = await ChatCallKitClient.getInstance.contactManager.fetchAllContactIds();
+      List<String> list = await ChatCallKitClient.getInstance.contactManager
+          .fetchAllContactIds();
       users.clear();
       selectedUsers.clear();
       users.addAll(list);

@@ -61,7 +61,8 @@ class MultiCallPage extends StatefulWidget {
   State<MultiCallPage> createState() => _MultiCallPageState();
 }
 
-class _MultiCallPageState extends State<MultiCallPage> with ChatCallKitObserver {
+class _MultiCallPageState extends State<MultiCallPage>
+    with ChatCallKitObserver {
   final PageController _controller = PageController();
   bool mute = false;
   bool cameraOn = true;
@@ -127,7 +128,8 @@ class _MultiCallPageState extends State<MultiCallPage> with ChatCallKitObserver 
   @override
   void onUserJoined(agoraUid, userId) {
     setState(() {
-      list.removeWhere((element) => element.userId == userId || element.agoraUid == agoraUid);
+      list.removeWhere((element) =>
+          element.userId == userId || element.agoraUid == agoraUid);
       list.add(MultiCallItemView(
         agoraUid: agoraUid,
         userId: userId,
@@ -140,7 +142,8 @@ class _MultiCallPageState extends State<MultiCallPage> with ChatCallKitObserver 
   @override
   void onUserLeaved(agoraUid, userId) {
     setState(() {
-      list.removeWhere((element) => element.userId == userId || element.agoraUid == agoraUid);
+      list.removeWhere((element) =>
+          element.userId == userId || element.agoraUid == agoraUid);
     });
   }
 
@@ -251,7 +254,10 @@ class _MultiCallPageState extends State<MultiCallPage> with ChatCallKitObserver 
         Text(
           widget.nickname ?? widget.caller ?? "",
           style: widget.nicknameTextStyle ??
-              const TextStyle(fontWeight: FontWeight.w600, color: Colors.white, fontSize: 24),
+              const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 24),
         ),
         const SizedBox(height: 10),
         const Text(
@@ -320,7 +326,8 @@ class _MultiCallPageState extends State<MultiCallPage> with ChatCallKitObserver 
           await ChatCallKitManager.cameraOff();
         }
         String? currentUserId = ChatCallKitClient.getInstance.currentUserId;
-        int index = list.indexWhere((element) => currentUserId != null && element.userId == currentUserId);
+        int index = list.indexWhere((element) =>
+            currentUserId != null && element.userId == currentUserId);
         if (index != -1) {
           MultiCallItemView view = list[index];
           view = view.copyWith(muteVideo: !cameraOn);
@@ -330,7 +337,8 @@ class _MultiCallPageState extends State<MultiCallPage> with ChatCallKitObserver 
       },
       selectImage: Image.asset("images/video_on.png"),
       unselectImage: Image.asset("images/video_off.png"),
-      backgroundColor: cameraOn ? const Color.fromRGBO(255, 255, 255, 0.2) : Colors.white,
+      backgroundColor:
+          cameraOn ? const Color.fromRGBO(255, 255, 255, 0.2) : Colors.white,
     );
   }
 

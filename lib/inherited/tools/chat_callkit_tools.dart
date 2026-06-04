@@ -1,11 +1,14 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
-bool enableLog = false;
+import 'chat_callkit_log.dart';
+
+bool enableLog = true;
 
 log(String log) {
   if (enableLog) {
-    debugPrint("ChatCallKit: $log");
+    // developer.log(log, name: 'ChatCallKit');
+    ChatCallKitLogger.instance.log(log);
   }
 }
 

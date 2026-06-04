@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:em_chat_callkit/chat_callkit.dart';
-import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart';
+import 'package:em_chat_callkit/inherited/tools/chat_callkit_log.dart';
+import 'package:em_chat_callkit/inherited/tools/chat_callkit_tools.dart'
+    as tools;
 import 'package:flutter/material.dart';
 
 class RTCOptions {
@@ -44,14 +48,18 @@ class RTCEventHandler {
   final void Function(int userId)? onUserLeaved;
   final void Function(int remoteUid, bool muted)? onUserMuteVideo;
   final void Function(int remoteUid, bool muted)? onUserMuteAudio;
-  final void Function(int remoteUid, int width, int height)? onFirstRemoteVideoDecoded;
-  final void Function(int remoteUid, RemoteVideoState state, RemoteVideoStateReason reason)? onRemoteVideoStateChanged;
+  final void Function(int remoteUid, int width, int height)?
+      onFirstRemoteVideoDecoded;
+  final void Function(
+          int remoteUid, RemoteVideoState state, RemoteVideoStateReason reason)?
+      onRemoteVideoStateChanged;
   final void Function(int uid)? onActiveSpeaker;
 }
 
 class AgoraRTCManager {
   void rtcLog(String method, ChatCallKitMessage msg) {
-    log("rtc method: $method, ${msg.toJson().toString()}");
+    tools.log(
+        "AgoraRTCManager: rtc method: $method, ${msg.toJson().toString()}");
   }
 
   AgoraRTCManager(
@@ -65,9 +73,12 @@ class AgoraRTCManager {
       onVideoStopped: () {},
       onLocalVideoStateChanged: (source, state, error) {},
       onRemoteVideoStats: (connection, stats) {},
-      onVideoPublishStateChanged: (source, channel, oldState, newState, elapseSinceLastState) {},
-      onVideoSizeChanged: (connection, sourceType, uid, width, height, rotation) {},
-      onVideoSubscribeStateChanged: (channel, uid, oldState, newState, elapseSinceLastState) {},
+      onVideoPublishStateChanged:
+          (source, channel, oldState, newState, elapseSinceLastState) {},
+      onVideoSizeChanged:
+          (connection, sourceType, uid, width, height, rotation) {},
+      onVideoSubscribeStateChanged:
+          (channel, uid, oldState, newState, elapseSinceLastState) {},
       onError: (err, msg) {
         handler.onError?.call(ErrorCodeType.errFailed, msg);
       },
@@ -124,6 +135,7 @@ class AgoraRTCManager {
     );
   }
   bool _engineHasInit = false;
+  Future<void>? _engineInitializing;
   RTCOptions? options;
   String? agoraAppId;
   late RtcEngine _engine;
@@ -131,30 +143,103 @@ class AgoraRTCManager {
   RtcEngineEventHandler? _handler;
 
   Future<void> initEngine() async {
+    tools.log("AgoraRTCManager: in initEngine, engineHasInit: $_engineHasInit");
+    tools.log("AgoraRTCManager: in initEngine, engineInitializing: $_engineInitializing");
+
     if (_engineHasInit) return;
-    _engineHasInit = true;
-    _engine = createAgoraRtcEngine();
-    await _engine.initialize(RtcEngineContext(
-      appId: agoraAppId,
-      audioScenario: options?.audioScenarioType,
-      channelProfile: options?.channelProfile,
-      areaCode: options?.areaCode,
-    ));
-    await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
-    await _engine.setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
-    await _engine.setDefaultAudioRouteToSpeakerphone(true);
-    _engine.unregisterEventHandler(_handler!);
-    _engine.registerEventHandler(_handler!);
+    if (_engineInitializing != null) return _engineInitializing;
+
+    tools.log("AgoraRTCManager: in initEngine, called");
+
+    _engineInitializing = _initEngine();
+    try {
+      await _engineInitializing;
+    } finally {
+      _engineInitializing = null;
+    }
+
+    tools.log("AgoraRTCManager: in initEngine, end");
+  }
+
+  Future<void> _initEngine() async {
+    RtcEngine? engine;
+    try {
+      final String callkitLogPath =
+          await ChatCallKitLogger.instance.getCurrentLogFilePath();
+      final String rtcLogPath =
+          '${File(callkitLogPath).parent.path}/agorasdk.log';
+      tools.log("AgoraRTCManager: in _initEngine, rtc log path: $rtcLogPath");
+      engine = createAgoraRtcEngine();
+      await engine.initialize(RtcEngineContext(
+        appId: agoraAppId,
+        audioScenario: options?.audioScenarioType,
+        channelProfile: options?.channelProfile,
+        areaCode: options?.areaCode,
+        logConfig: LogConfig(
+          filePath: rtcLogPath,
+          fileSizeInKB: defaultLogSizeInKb,
+          level: LogLevel.logLevelInfo,
+        ),
+      ));
+      tools.log("AgoraRTCManager: in _initEngine, engine initialized");
+
+      await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+      tools.log("AgoraRTCManager: in _initEngine, client role set");
+
+      await engine
+          .setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
+      tools.log("AgoraRTCManager: in _initEngine, channel profile set");
+
+      await engine.setDefaultAudioRouteToSpeakerphone(true);
+      tools.log("AgoraRTCManager: in _initEngine, default audio route set to speakerphone");
+
+      engine.unregisterEventHandler(_handler!);
+      engine.registerEventHandler(_handler!);
+      tools.log("AgoraRTCManager: in _initEngine, event handler registered");
+
+      _engine = engine;
+      _engineHasInit = true;
+    } on AgoraRtcException catch (e) {
+      _engineHasInit = false;
+      tools.log(
+        "AgoraRTCManager: in _initEngine, failed, code: ${e.code}, message: ${e.message}",
+      );
+      try {
+        await engine?.release();
+      } catch (_) {}
+      rethrow;
+    } catch (e) {
+      _engineHasInit = false;
+      tools.log("AgoraRTCManager: in initEngine, failed: $e");
+      try {
+        await engine?.release();
+      } catch (_) {}
+      rethrow;
+    }
   }
 
   Future<void> releaseEngine() async {
+    tools.log("AgoraRTCManager: in releaseEngine, engineInitializing: $_engineInitializing");
+    if (_engineInitializing != null) {
+      try {
+        await _engineInitializing;
+      } catch (_) {
+        return;
+      }
+    }
+
+    tools.log("AgoraRTCManager: in releaseEngine, engineHasInit: $_engineHasInit");
+
     if (_engineHasInit) {
+      tools.log("AgoraRTCManager: in releaseEngine, set engineHasInit to false");
       _engineHasInit = false;
       try {
+        tools.log("AgoraRTCManager: in releaseEngine, release engine");
         await _engine.release();
+        tools.log("AgoraRTCManager: in releaseEngine, engine released");
         // ignore: empty_catches
       } catch (e) {
-        log("release failed");
+        tools.log("AgoraRTCManager: in releaseEngine, release failed: $e");
       }
     }
   }
@@ -169,6 +254,7 @@ class AgoraRTCManager {
     String channel,
     int uid,
   ) async {
+    tools.log("AgoraRTCManager: joinChannel, called");
     try {
       await _engine.joinChannel(
         token: token,
@@ -177,14 +263,20 @@ class AgoraRTCManager {
         options: const ChannelMediaOptions(),
       );
     } catch (e) {
-      handler.onError
-          ?.call(ErrorCodeType.errFailed, "General error with no classified reason. Try calling the method again");
+      tools.log("AgoraRTCManager: joinChannel failed: $e");
+      handler.onError?.call(ErrorCodeType.errFailed,
+          "General error with no classified reason. Try calling the method again");
     }
   }
 
   Future<void> leaveChannel() async {
-    if (!_engineHasInit) return;
+    tools.log("AgoraRTCManager: in leaveChannel, engineHasInit: $_engineHasInit");
+    if (!_engineHasInit) {
+      tools.log("AgoraRTCManager: in leaveChannel, engineHasInit is false, return");
+      return;
+    }
     try {
+      tools.log("AgoraRTCManager: in leaveChannel, called");
       await _engine.leaveChannel();
       // ignore: empty_catches
     } catch (e) {}
