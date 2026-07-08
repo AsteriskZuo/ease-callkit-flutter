@@ -207,18 +207,18 @@ class _MyHomePageState extends State<MyHomePage> with ChatCallKitObserver {
 
   void _signIn() async {
     _addLogToConsole('sign in...');
-    String? agoraToken = await fetchAccountToken(_userId, _token);
-    if (agoraToken == null) {
-      _addLogToConsole('sign in fail.');
-    } else {
-      try {
-        await ChatCallKitClient.getInstance.loginWithToken(_userId, agoraToken);
+    // String? agoraToken = await fetchAccountToken(_userId, _token);
+    // if (agoraToken == null) {
+    //   _addLogToConsole('sign in fail.');
+    // } else {
+    try {
+      await ChatCallKitClient.getInstance.loginWithPassword(_userId, _token);
 
-        _addLogToConsole('sign in success');
-      } on ChatCallKitChatError catch (e) {
-        _addLogToConsole('sign in fail: ${e.description}');
-      }
+      _addLogToConsole('sign in success');
+    } on ChatCallKitChatError catch (e) {
+      _addLogToConsole('sign in fail: ${e.description}');
     }
+    // }
   }
 
   void _signOut() async {
