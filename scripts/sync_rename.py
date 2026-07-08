@@ -17,6 +17,7 @@ This script:
 
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -40,6 +41,22 @@ TEXT_EXTENSIONS = {
     '.dart', '.yaml', '.yml', '.java', '.kt', '.h', '.m', '.swift',
     '.gradle', '.xml', '.podspec', '.md', '.plist', '.pbxproj',
     '.xcconfig', '.json', '.txt', '.properties', '.kts',
+}
+
+# ── SDK configuration per known prefix ────────────────────────────────────────
+# Independent of the callkit prefix rename. Maps each prefix to its chat SDK
+# package name, class naming prefix, and homepage URL.
+SDK_CONFIG = {
+    'em': {
+        'sdk_package': 'im_flutter_sdk',
+        'class_prefix': 'EM',
+        'homepage': 'https://www.easemob.com',
+    },
+    'agora': {
+        'sdk_package': 'agora_chat_sdk',
+        'class_prefix': 'Chat',
+        'homepage': 'https://www.agora.io',
+    },
 }
 
 
@@ -86,6 +103,52 @@ def build_replacements(src_prefix, dst_prefix):
     ]
 
 
+def build_sdk_replacements(src_prefix, dst_prefix):
+    """Build SDK-specific text replacements (package name).
+
+    Returns a list of (old, new) tuples for simple string replacement.
+    """
+    src_cfg = SDK_CONFIG.get(src_prefix)
+    dst_cfg = SDK_CONFIG.get(dst_prefix)
+    if not src_cfg or not dst_cfg:
+        return []
+
+    result = []
+    if src_cfg['sdk_package'] != dst_cfg['sdk_package']:
+        result.append((src_cfg['sdk_package'], dst_cfg['sdk_package']))
+    return result
+
+
+def get_sdk_class_prefix_rule(src_prefix, dst_prefix):
+    """Return (old_prefix, new_prefix) for SDK class rename, or None.
+
+    For em → agora:  EM  → Chat  (EMClient → ChatClient, EMChatManager → ChatManager)
+    For agora → em:  Chat → EM   (ChatClient → EMClient, ChatManager → EMChatManager)
+    """
+    src_cfg = SDK_CONFIG.get(src_prefix)
+    dst_cfg = SDK_CONFIG.get(dst_prefix)
+    if not src_cfg or not dst_cfg:
+        return None
+    old_cls = src_cfg['class_prefix']
+    new_cls = dst_cfg['class_prefix']
+    if old_cls == new_cls:
+        return None
+    return (old_cls, new_cls)
+
+
+def apply_sdk_class_prefix(text, old_cls, new_cls):
+    """Replace SDK class name prefix using regex.
+
+    Two-step approach to avoid doubling (e.g. EMChatManager → ChatChatManager):
+      1. Replace combined prefix:  EMChat(?=[A-Z]) → Chat
+      2. Replace remaining prefix: EM(?=[A-Z])     → Chat
+    """
+    combined = old_cls + new_cls   # e.g. "EMChat" or "ChatEM"
+    text = re.sub(r'\b' + re.escape(combined) + r'(?=[A-Z])', new_cls, text)
+    text = re.sub(r'\b' + re.escape(old_cls) + r'(?=[A-Z])', new_cls, text)
+    return text
+
+
 def should_skip_dir(dirname):
     return dirname in SKIP_DIRS
 
@@ -99,9 +162,11 @@ def is_text_file(filepath):
     return ext.lower() in TEXT_EXTENSIONS
 
 
-def replace_in_text(text, replacements):
+def replace_in_text(text, replacements, sdk_class_prefix_rule=None):
     for old, new in replacements:
         text = text.replace(old, new)
+    if sdk_class_prefix_rule:
+        text = apply_sdk_class_prefix(text, *sdk_class_prefix_rule)
     return text
 
 
@@ -157,7 +222,43 @@ def check_target_git_status(dst_repo):
             print(f"  Nothing to clean.")
 
 
-def sync_repo(src_repo, dst_repo, replacements):
+def update_pubspec(dst_repo, dst_prefix, version=None):
+    """Update pubspec.yaml homepage and version after sync."""
+    pubspec_path = os.path.join(dst_repo, 'pubspec.yaml')
+    if not os.path.isfile(pubspec_path):
+        print("  pubspec.yaml not found, skipping.")
+        return
+
+    dst_cfg = SDK_CONFIG.get(dst_prefix, {})
+    homepage = dst_cfg.get('homepage')
+
+    with open(pubspec_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    new_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if homepage and stripped.startswith('homepage:'):
+            indent = line[:len(line) - len(line.lstrip())]
+            line = f'{indent}homepage: {homepage}\n'
+        if version and stripped.startswith('version:'):
+            indent = line[:len(line) - len(line.lstrip())]
+            line = f'{indent}version: {version}\n'
+        new_lines.append(line)
+
+    with open(pubspec_path, 'w', encoding='utf-8') as f:
+        f.writelines(new_lines)
+
+    changes = []
+    if homepage:
+        changes.append(f'homepage → {homepage}')
+    if version:
+        changes.append(f'version → {version}')
+    if changes:
+        print(f"  Updated pubspec.yaml: {', '.join(changes)}")
+
+
+def sync_repo(src_repo, dst_repo, replacements, sdk_class_prefix_rule=None):
     """Copy src to dst, applying text replacements and path renames."""
     src_repo = os.path.abspath(src_repo)
     dst_repo = os.path.abspath(dst_repo)
@@ -209,7 +310,7 @@ def sync_repo(src_repo, dst_repo, replacements):
                 try:
                     with open(src_file, 'r', encoding='utf-8') as f:
                         content = f.read()
-                    content = replace_in_text(content, replacements)
+                    content = replace_in_text(content, replacements, sdk_class_prefix_rule)
                     with open(dst_file, 'w', encoding='utf-8') as f:
                         f.write(content)
                     file_count += 1
@@ -248,6 +349,8 @@ def main():
         description='Sync and rename a Flutter plugin between two repos.')
     parser.add_argument('source', help='Path to source repo (e.g. em_chat_callkit)')
     parser.add_argument('target', help='Path to target repo (e.g. agora_chat_callkit)')
+    parser.add_argument('--version', default=None,
+                        help='Set version in target pubspec.yaml (e.g. 1.0.0)')
     parser.add_argument('--skip-flutter', action='store_true',
                         help='Skip running flutter clean/pub get')
     args = parser.parse_args()
@@ -278,17 +381,32 @@ def main():
     print(f"Target prefix: '{dst_prefix}' ({dst_prefix}_chat_callkit)")
 
     replacements = build_replacements(src_prefix, dst_prefix)
+
+    # SDK-specific replacements (package name)
+    sdk_replacements = build_sdk_replacements(src_prefix, dst_prefix)
+    replacements.extend(sdk_replacements)
+
+    # SDK class prefix rule (e.g. EM → Chat)
+    sdk_class_prefix_rule = get_sdk_class_prefix_rule(src_prefix, dst_prefix)
+
     print(f"\nReplacement rules:")
     for old, new in replacements:
         print(f"  {old} → {new}")
+    if sdk_class_prefix_rule:
+        old_cls, new_cls = sdk_class_prefix_rule
+        print(f"  {old_cls}* → {new_cls}* (SDK class prefix, regex)")
 
     # Check target repo git status
     print(f"\nChecking target repo ...")
     check_target_git_status(dst_repo)
 
     print(f"\nSyncing ...")
-    file_count, rename_count = sync_repo(src_repo, dst_repo, replacements)
+    file_count, rename_count = sync_repo(src_repo, dst_repo, replacements, sdk_class_prefix_rule)
     print(f"  Copied {file_count} files, renamed {rename_count} files/dirs.")
+
+    # Update pubspec.yaml (homepage, version)
+    print(f"\nUpdating pubspec.yaml ...")
+    update_pubspec(dst_repo, dst_prefix, version=args.version)
 
     if not args.skip_flutter:
         print(f"\nRunning Flutter commands ...")
