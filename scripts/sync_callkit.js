@@ -309,6 +309,18 @@ function deleteChangelog(targetRepo) {
   return false;
 }
 
+function removeTargetOnlyDirectories(targetRepo) {
+  const removed = [];
+  for (const dirname of ['scripts', 'docs']) {
+    const dirPath = path.join(targetRepo, dirname);
+    if (fs.existsSync(dirPath)) {
+      fs.rmSync(dirPath, { recursive: true, force: true });
+      removed.push(dirname);
+    }
+  }
+  return removed;
+}
+
 function main() {
   const [, , sourceArg, targetArg, version, chatSdkVersion] = process.argv;
   if (!sourceArg || !targetArg || !version || !chatSdkVersion) {
@@ -339,12 +351,16 @@ function main() {
   const licenseChanged = updateLicense(targetRepo);
   writeCallDefine(targetRepo);
   const changelogDeleted = deleteChangelog(targetRepo);
+  const removedDirectories = removeTargetOnlyDirectories(targetRepo);
 
   console.log('Sync complete.');
   console.log(`Text files changed: ${textFilesChanged}`);
   console.log(`Paths renamed: ${pathsRenamed}`);
   console.log(`LICENSE updated: ${licenseChanged ? 'yes' : 'no changes needed'}`);
   console.log(`CHANGELOG.md deleted: ${changelogDeleted ? 'yes' : 'not present'}`);
+  console.log(
+    `Target directories removed: ${removedDirectories.length > 0 ? removedDirectories.join(', ') : 'none'}`,
+  );
 }
 
 if (require.main === module) {

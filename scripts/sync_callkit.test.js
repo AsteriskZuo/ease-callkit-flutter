@@ -114,6 +114,8 @@ test('mirrors source into target then applies agora callkit replacements', () =>
     'LICENSE': 'Copyright 2026 Easemob\nhttps://www.easemob.com\n',
     'CHANGELOG.md': '# Changelog\n',
     'README.md': 'README mentions em_chat_callkit and must stay copied.\n',
+    'scripts/source_tool.js': 'console.log("source script");\n',
+    'docs/source.md': '# source docs\n',
     'lib/inherited/tools/call_define.dart': [
       "import 'package:im_flutter_sdk/im_flutter_sdk.dart' as chat;",
       '',
@@ -145,6 +147,8 @@ test('mirrors source into target then applies agora callkit replacements', () =>
   assert.equal(fs.existsSync(path.join(target, 'target_only.dart')), false);
   assert.equal(fs.existsSync(path.join(target, 'ignored.tmp')), false);
   assert.equal(fs.existsSync(path.join(target, 'CHANGELOG.md')), false);
+  assert.equal(fs.existsSync(path.join(target, 'scripts')), false);
+  assert.equal(fs.existsSync(path.join(target, 'docs')), false);
   assert.equal(fs.existsSync(path.join(target, 'ios/agora_chat_callkit.podspec')), true);
   assert.equal(fs.existsSync(path.join(target, 'ios/Classes/AgoraChatCallkitPlugin.h')), true);
 
