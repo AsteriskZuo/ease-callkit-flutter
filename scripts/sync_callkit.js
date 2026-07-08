@@ -27,7 +27,6 @@ const TEXT_EXTENSIONS = new Set([
 ]);
 
 const SKIP_CONTENT_FILES = new Set([
-  'README.md',
   'pubspec.lock',
   'Podfile.lock',
   'Manifest.lock',
@@ -279,9 +278,10 @@ function updateLicense(targetRepo) {
 
   const original = fs.readFileSync(licensePath, 'utf8');
   let next = original
-    .replace(/https?:\/\/(?:www\.)?easemob\.com(?:\/[^\s]*)?/gi, 'https://www.agora.io')
-    .replace(/\b(?:Easemob|Hyphenate)(?:,\s*Inc\.)?\b/g, 'Agora, Inc.')
-    .replace(/\b(?:easemob|hyphenate)(?:,\s*inc\.)?\b/g, 'Agora, Inc.');
+    .replace(/https?:\/\/(?:www\.)?easemob\.com(?:\/[^\s)]*)?/gi, 'https://www.agora.io')
+    .replace(/\b(?:www\.)?easemob\.com\b/gi, 'www.agora.io')
+    .replace(/\b(?:Easemob|Hyphenate)(?:,\s*Inc\.)?\b/g, 'Agora')
+    .replace(/\b(?:easemob|hyphenate)(?:,\s*inc\.)?\b/g, 'Agora');
 
   if (next === original && !/www\.agora\.io/i.test(next)) {
     next = original.replace(/\s*$/, '\n') + 'https://www.agora.io\n';

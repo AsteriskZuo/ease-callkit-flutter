@@ -111,7 +111,7 @@ test('mirrors source into target then applies agora callkit replacements', () =>
       '        pluginClass: EmChatCallkitPlugin',
       '',
     ].join('\n'),
-    'LICENSE': 'Copyright 2026 Easemob\nhttps://www.easemob.com\n',
+    'LICENSE': 'Copyright (c) 2026 Easemob (www.easemob.com)\n',
     'CHANGELOG.md': '# Changelog\n',
     'README.md': 'README mentions em_chat_callkit and must stay copied.\n',
     'scripts/source_tool.js': 'console.log("source script");\n',
@@ -160,11 +160,12 @@ test('mirrors source into target then applies agora callkit replacements', () =>
   assert.doesNotMatch(pubspec, /im_flutter_sdk|em_chat_callkit|EmChatCallkitPlugin/);
 
   const license = fs.readFileSync(path.join(target, 'LICENSE'), 'utf8');
-  assert.match(license, /www\.agora\.io/);
+  assert.equal(license, 'Copyright (c) 2026 Agora (www.agora.io)\n');
   assert.doesNotMatch(license, /easemob/i);
+  assert.doesNotMatch(license, /Agora, Inc\.\.com/);
 
   const readme = fs.readFileSync(path.join(target, 'README.md'), 'utf8');
-  assert.equal(readme, 'README mentions em_chat_callkit and must stay copied.\n');
+  assert.equal(readme, 'README mentions agora_chat_callkit and must stay copied.\n');
 
   const callDefine = fs.readFileSync(
     path.join(target, 'lib/inherited/tools/call_define.dart'),
