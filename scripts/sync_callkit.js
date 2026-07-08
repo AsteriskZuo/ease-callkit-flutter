@@ -61,10 +61,10 @@ const CALL_DEFINE_CONTENT = [
 function usage() {
   return [
     'Usage:',
-    '  node scripts/sync_callkit.js <source_repo> <target_repo> <target_version>',
+    '  node scripts/sync_callkit.js <source_repo> <target_repo> <target_version> <chat_sdk_version>',
     '',
     'Example:',
-    '  node scripts/sync_callkit.js ../ease-callkit-flutter ../AgoraChat-Callkit-flutter 1.2.3',
+    '  node scripts/sync_callkit.js ../ease-callkit-flutter ../AgoraChat-Callkit-flutter 1.2.3 ^1.2.0',
   ].join('\n');
 }
 
@@ -120,10 +120,17 @@ function ensureNoTrackedChanges(label, repo) {
   }
 }
 
-function validateVersion(version) {
+function validateVersion(label, version) {
   if (!version || /\s/.test(version)) {
-    fail('Error: target_version must be a non-empty value without whitespace.');
+    fail(`Error: ${label} must be a non-empty value without whitespace.`);
   }
+}
+
+function normalizeDependencyVersion(version) {
+  if (/^[\^~><=]/.test(version)) {
+    return version;
+  }
+  return `^${version}`;
 }
 
 function removeTargetContents(targetRepo) {
@@ -239,19 +246,26 @@ function renamePaths(targetRepo) {
   return renamed;
 }
 
-function updatePubspec(targetRepo, version) {
+function updatePubspec(targetRepo, version, chatSdkVersion) {
   const pubspecPath = path.join(targetRepo, 'pubspec.yaml');
   const original = fs.readFileSync(pubspecPath, 'utf8');
   let next = replaceAll(original);
 
   next = next.replace(/^version:\s*.*$/m, `version: ${version}`);
   next = next.replace(/^homepage:\s*.*$/m, 'homepage: https://www.agora.io');
+  next = next.replace(
+    /^(\s*)agora_chat_sdk:\s*.*$/m,
+    `$1agora_chat_sdk: ${normalizeDependencyVersion(chatSdkVersion)}`,
+  );
 
   if (!/^version:\s*/m.test(next)) {
     fail('Error: pubspec.yaml does not contain a version field.');
   }
   if (!/^homepage:\s*/m.test(next)) {
     next = `${next.replace(/\s*$/, '\n')}homepage: https://www.agora.io\n`;
+  }
+  if (!/^\s*agora_chat_sdk:\s*/m.test(next)) {
+    fail('Error: pubspec.yaml does not contain an agora_chat_sdk dependency.');
   }
 
   fs.writeFileSync(pubspecPath, next);
@@ -296,15 +310,16 @@ function deleteChangelog(targetRepo) {
 }
 
 function main() {
-  const [, , sourceArg, targetArg, version] = process.argv;
-  if (!sourceArg || !targetArg || !version) {
+  const [, , sourceArg, targetArg, version, chatSdkVersion] = process.argv;
+  if (!sourceArg || !targetArg || !version || !chatSdkVersion) {
     fail(usage());
   }
 
   const sourceRepo = path.resolve(sourceArg);
   const targetRepo = path.resolve(targetArg);
 
-  validateVersion(version);
+  validateVersion('target_version', version);
+  validateVersion('chat_sdk_version', chatSdkVersion);
   ensureRepo('source', sourceRepo);
   ensureRepo('target', targetRepo);
   ensureClean('source', sourceRepo);
@@ -320,7 +335,7 @@ function main() {
 
   const textFilesChanged = replaceTextFiles(targetRepo);
   const pathsRenamed = renamePaths(targetRepo);
-  updatePubspec(targetRepo, version);
+  updatePubspec(targetRepo, version, chatSdkVersion);
   const licenseChanged = updateLicense(targetRepo);
   writeCallDefine(targetRepo);
   const changelogDeleted = deleteChangelog(targetRepo);

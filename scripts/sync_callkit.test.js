@@ -30,13 +30,20 @@ function makeRepo(root, files) {
   run('git', ['commit', '-m', 'initial'], root);
 }
 
-function runScript(sourceRepo, targetRepo, version) {
+function runScript(sourceRepo, targetRepo, version, chatSdkVersion = '^1.2.3') {
   return spawnSync(
     process.execPath,
-    [scriptPath, sourceRepo, targetRepo, version],
+    [scriptPath, sourceRepo, targetRepo, version, chatSdkVersion],
     { encoding: 'utf8' },
   );
 }
+
+test('requires target package version and chat SDK version arguments', () => {
+  const result = spawnSync(process.execPath, [scriptPath], { encoding: 'utf8' });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr + result.stdout, /<chat_sdk_version>/);
+});
 
 test('stops when source repo has uncommitted or untracked files', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sync-callkit-dirty-source-'));
@@ -131,7 +138,7 @@ test('mirrors source into target then applies agora callkit replacements', () =>
 
   writeFile(path.join(target, 'ignored.tmp'), 'removed by git clean');
 
-  const result = runScript(source, target, '2.3.4');
+  const result = runScript(source, target, '2.3.4', '1.9.0');
 
   assert.equal(result.status, 0, result.stderr + result.stdout);
   assert.equal(fs.existsSync(path.join(target, '.git')), true);
@@ -145,7 +152,7 @@ test('mirrors source into target then applies agora callkit replacements', () =>
   assert.match(pubspec, /^name: agora_chat_callkit$/m);
   assert.match(pubspec, /^version: 2\.3\.4$/m);
   assert.match(pubspec, /^homepage: https:\/\/www\.agora\.io$/m);
-  assert.match(pubspec, /agora_chat_sdk: \^4\.15\.2/);
+  assert.match(pubspec, /agora_chat_sdk: \^1\.9\.0/);
   assert.doesNotMatch(pubspec, /im_flutter_sdk|em_chat_callkit|EmChatCallkitPlugin/);
 
   const license = fs.readFileSync(path.join(target, 'LICENSE'), 'utf8');
