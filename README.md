@@ -39,14 +39,14 @@ If your target platform is iOS, your development environment must meet the follo
 - macOS
 - Xcode 12.4 or later with Xcode Command Line Tools
 - CocoaPods
-- An iOS simulator or a real iOS device running iOS 10.0 or later
+- An iOS simulator or a real iOS device running iOS 12.0 or later
 
 If your target platform is Android, your development environment must meet the following requirements:
 - Flutter 3.3.0 or later
 - Dart >=3.0.0 <4.0.0
 - macOS or Windows
 - Android Studio 4.0 or later with JDK 1.8 or later
-- An Android simulator or a real Android device running Android SDK API level 21 or later
+- An Android simulator or a real Android device running Android SDK API level 24 or later
 
 <div class="alert note">You can run <code>flutter doctor</code> to see if there are any platform dependencies you need to complete the setup.</div>
 
@@ -57,7 +57,7 @@ If your target platform is Android, your development environment must meet the f
 Add the following dependencies in `pubspec.yaml`:
 
 ```sh
-  im_flutter_sdk: ^4.2.0
+  im_flutter_sdk: ^4.19.3
   agora_rtc_engine: ^6.3.0
 ```
 
