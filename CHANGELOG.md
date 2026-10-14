@@ -1,3 +1,9 @@
+## 0.0.5
+- 升级依赖 `im_flutter_sdk` 为 `^5.0.0`，同步更新 iOS `HyphenateChat` 至 5.0.0；
+- 适配 5.0.0 仅支持 Token 登录的变更：示例工程改为每次手动 Token 登录，并移除自动登录、密码登录及旧注册换 Token 流程；
+- 适配 5.0.0 联系人本地数据 API：启用会话和联系人数据同步，使用 `getAllContacts()` 获取联系人；
+- 更新 README 中的依赖版本与示例配置。
+
 ## 0.0.4
 - 升级 依赖 im_flutter_sdk 为 ^4.25.0；
 - 撤销 0.0.3 开始追踪根目录 pubspec.lock 的做法：根目录 pubspec.lock 退出 git 追踪（本地文件保留），遵循 Dart 库包不提交 pubspec.lock 的约定；
