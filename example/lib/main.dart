@@ -17,7 +17,8 @@ void main() async {
   assert(Config.appkey.isNotEmpty, 'must set appkey.');
   final options = ChatOptions.withAppKey(
     Config.appkey,
-    autoLogin: false,
+    dataSyncType: ChatCallKitDataSyncType.conversations |
+        ChatCallKitDataSyncType.contacts,
   );
   await ChatCallKitClient.getInstance.init(options);
   runApp(const MyApp());
@@ -102,9 +103,9 @@ class _MyHomePageState extends State<MyHomePage> with ChatCallKitObserver {
                 Expanded(
                   child: TextField(
                     decoration: const InputDecoration(
-                      hintText: "Password",
+                      hintText: "Token",
                     ),
-                    onChanged: (pwd) => _token = pwd,
+                    onChanged: (token) => _token = token,
                   ),
                 ),
               ],
@@ -134,18 +135,6 @@ class _MyHomePageState extends State<MyHomePage> with ChatCallKitObserver {
                           WidgetStateProperty.all(Colors.lightBlue),
                     ),
                     child: const Text("SIGN OUT"),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextButton(
-                    onPressed: _signUp,
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.all(Colors.white),
-                      backgroundColor:
-                          WidgetStateProperty.all(Colors.lightBlue),
-                    ),
-                    child: const Text("SIGN UP"),
                   ),
                 ),
               ],
@@ -207,18 +196,13 @@ class _MyHomePageState extends State<MyHomePage> with ChatCallKitObserver {
 
   void _signIn() async {
     _addLogToConsole('sign in...');
-    // String? agoraToken = await fetchAccountToken(_userId, _token);
-    // if (agoraToken == null) {
-    //   _addLogToConsole('sign in fail.');
-    // } else {
     try {
-      await ChatCallKitClient.getInstance.loginWithPassword(_userId, _token);
+      await ChatCallKitClient.getInstance.loginWithToken(_userId, _token);
 
       _addLogToConsole('sign in success');
     } on ChatCallKitChatError catch (e) {
       _addLogToConsole('sign in fail: ${e.description}');
     }
-    // }
   }
 
   void _signOut() async {
@@ -228,16 +212,6 @@ class _MyHomePageState extends State<MyHomePage> with ChatCallKitObserver {
       _addLogToConsole('sign out success');
     } on ChatCallKitChatError catch (e) {
       _addLogToConsole('sign out fail: ${e.description}');
-    }
-  }
-
-  void _signUp() async {
-    _addLogToConsole('sign up...');
-    String? errorStr = await registerAccount(_userId, _token);
-    if (errorStr != null) {
-      _addLogToConsole('sign up fail: $errorStr');
-    } else {
-      _addLogToConsole('sign up success');
     }
   }
 

@@ -98,11 +98,12 @@ class _ContactPageState extends State<ContactPage> {
 
   Future<void> refresh() async {
     try {
-      List<String> list = await ChatCallKitClient.getInstance.contactManager
-          .fetchAllContactIds();
+      final contacts =
+          await ChatCallKitClient.getInstance.contactManager.getAllContacts();
+      final userIds = contacts.map((contact) => contact.userId);
       users.clear();
       selectedUsers.clear();
-      users.addAll(list);
+      users.addAll(userIds);
       if (mounted) {
         setState(() {});
       }

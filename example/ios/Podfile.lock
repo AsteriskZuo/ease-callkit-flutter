@@ -48,11 +48,11 @@ PODS:
   - em_chat_callkit (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - HyphenateChat (4.25.0):
+  - HyphenateChat (5.0.0):
     - ShengwangInfra_iOS (~> 1.3.0)
-  - im_flutter_sdk_ios (4.25.0):
+  - im_flutter_sdk_ios (5.0.0):
     - Flutter
-    - HyphenateChat (= 4.25.0)
+    - HyphenateChat (= 5.0.0)
   - integration_test (0.0.1):
     - Flutter
   - iris_method_channel (0.0.1):
@@ -107,8 +107,8 @@ SPEC CHECKSUMS:
   AgoraRtcEngine_iOS: 5092a058c7b2842db39d8ca614d451af6f84969a
   em_chat_callkit: ca429d670ddcf56cee59b4e6728a958f53f8f510
   Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
-  HyphenateChat: ea10cee23c4855b4cc6b8cf95d15a2f54a39fb9b
-  im_flutter_sdk_ios: f31bccbac9c17e8968d0c652173bf3e363eb18f4
+  HyphenateChat: 32bb7305bfb333d3902ef9497b6892470bf1fa61
+  im_flutter_sdk_ios: b7fbdb018ca9feefcee370b8ed48f908ee218093
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   iris_method_channel: 7d661cf3259b3009ae423508470dbeb9374446ee
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880

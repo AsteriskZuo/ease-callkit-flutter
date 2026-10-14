@@ -57,8 +57,8 @@ If your target platform is Android, your development environment must meet the f
 Add the following dependencies in `pubspec.yaml`:
 
 ```sh
-  im_flutter_sdk: ^4.19.3
-  agora_rtc_engine: ^6.3.0
+  im_flutter_sdk: ^5.0.0
+  agora_rtc_engine: 6.5.1
 ```
 
 ### Add project permissions
@@ -464,10 +464,7 @@ class Config {
 
   static String appServerDomain = "";
 
-  static String appServerRegister = '';
-  static String appServerGetAgoraToken = '';
-
-  static String appServerTokenURL = "";
+  static String appServerRTCTokenURL = "";
   static String appServerUserMapperURL = "";
 }
 ```

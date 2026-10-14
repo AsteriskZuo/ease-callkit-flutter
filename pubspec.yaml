@@ -1,6 +1,6 @@
 name: em_chat_callkit
 description: “A set of components adapted to the chat and rtc SDK that enables quick building of video or audio calls.”
-version: 0.0.4
+version: 0.0.5
 homepage: https://www.easemob.com
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
     
-  im_flutter_sdk: ^4.25.0
+  im_flutter_sdk: ^5.0.0
 
   # agora_rtc_engine: ^6.3.0
   agora_rtc_engine: 6.5.1

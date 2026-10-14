@@ -7,3 +7,4 @@ typedef ChatCallKitMessage = chat.ChatMessage;
 typedef ChatCallKitMessageEvent = chat.ChatMessageEvent;
 typedef ChatCallKitChatError = chat.ChatError;
 typedef ChatOptions = chat.ChatOptions;
+typedef ChatCallKitDataSyncType = chat.ChatDataSyncType;

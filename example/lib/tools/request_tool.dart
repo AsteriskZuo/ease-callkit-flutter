@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:em_chat_callkit/chat_callkit.dart';
 
@@ -30,8 +29,7 @@ Future<Map<String, int>> requestRtcToken(
     "userAccount": userId,
   };
 
-  String unencodedPath =
-      '${Config.appServerRTCTokenURL}/$channel/user/$userId';
+  String unencodedPath = '${Config.appServerRTCTokenURL}/$channel/user/$userId';
 
   var uri = Uri.https(
     Config.appServerDomain,
@@ -51,8 +49,8 @@ Future<Map<String, int>> requestRtcToken(
   Map<String, dynamic>? map = convert.jsonDecode(response.body);
   if (map != null) {
     if (map["code"] == "RES_OK" || map["code"] == 200) {
-      int agoraUidValue = map["agoraUid"] is int 
-          ? map["agoraUid"] 
+      int agoraUidValue = map["agoraUid"] is int
+          ? map["agoraUid"]
           : int.parse(map["agoraUid"].toString());
       ret[map["accessToken"]] = agoraUidValue;
     }
@@ -111,62 +109,4 @@ Future<ChatCallKitUserMapper?> requestAppServerUserMapper(
   }
 
   return ret;
-}
-
-/// Register with userId and password. You are required to provide your own registration service.
-Future<String?> registerAccount(String userId, String password) async {
-  String? ret;
-  Map<String, String> params = {
-    "userAccount": userId,
-    "userPassword": password,
-  };
-  var uri = Uri.https(
-    Config.appServerDomain,
-    Config.appServerRegister,
-  );
-  var client = http.Client();
-
-  var response = await client.post(
-    uri,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode(params),
-  );
-  do {
-    Map<String, dynamic>? map = convert.jsonDecode(response.body);
-    if (map != null) {
-      if (map["code"] != "RES_OK") {
-        ret = map['code'];
-      }
-    }
-  } while (false);
-
-  return ret;
-}
-
-/// Obtain a agora token using the userId and password, You are required to provide your own registration service.
-Future<String?> fetchAccountToken(String userId, String password) async {
-  Map<String, String> params = {};
-  params["userAccount"] = userId;
-  params["userPassword"] = password;
-
-  var uri = Uri.https(
-    Config.appServerDomain,
-    Config.appServerGetToken,
-  );
-
-  var client = http.Client();
-  var response = await client.post(
-    uri,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode(params),
-  );
-  if (response.statusCode == 200) {
-    Map<String, dynamic>? map = convert.jsonDecode(response.body);
-    if (map != null) {
-      if (map["code"] == "RES_OK") {
-        return map["accessToken"];
-      }
-    }
-  }
-  return null;
 }
