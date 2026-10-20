@@ -59,7 +59,7 @@ Add the following dependencies in `pubspec.yaml`:
 ```sh
   em_chat_callkit: ^0.1.0
   im_flutter_sdk: ^5.0.0
-  agora_rtc_engine: 6.5.1
+  agora_rtc_engine: '>=6.5.1 <6.6.0'
 ```
 
 ### Upgrading to 0.1.0

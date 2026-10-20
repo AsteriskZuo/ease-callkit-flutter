@@ -43,6 +43,7 @@ target 'Runner' do
 end
 
 post_install do |installer|
+  PodHelpers.scrub_aosl_ldflags(installer)
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end

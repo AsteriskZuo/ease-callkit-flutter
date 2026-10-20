@@ -8,7 +8,7 @@
 |---|---|
 | Package version | `0.1.0` |
 | `im_flutter_sdk` | `^5.0.0` |
-| `agora_rtc_engine` | `6.5.1` |
+| `agora_rtc_engine` | `>=6.5.1 <6.6.0` |
 | Dart | `>=3.0.0 <4.0.0` |
 | Flutter | `>=3.3.0` |
 
