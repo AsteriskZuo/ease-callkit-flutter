@@ -6,7 +6,7 @@
 
 | Item | Current value |
 |---|---|
-| Package version | `0.0.5` |
+| Package version | `0.1.0` |
 | `im_flutter_sdk` | `^5.0.0` |
 | `agora_rtc_engine` | `6.5.1` |
 | Dart | `>=3.0.0 <4.0.0` |
@@ -62,7 +62,7 @@ An application initializes the IM client, places `ChatCallKit` above call UI, re
 
 ## Lifecycle And State Rules
 
-- Initialize `ChatCallKitClient` before starting or receiving calls. Configure `ChatCallKit` with a valid RTC App ID before RTC initialization.
+- Initialize `ChatCallKitClient` and explicitly log in with a token before starting or receiving calls. SDK 5.0 removes password login and automatic login; CallKit 0.1.0 marks this integration break from 0.0.4 and earlier. Configure `ChatCallKit` with a valid RTC App ID before RTC initialization.
 - `initRTC()` and `releaseRTC()` are a lifecycle pair. Release the engine after the call flow no longer needs it.
 - Register `RtcTokenHandler` and `UserMapperHandler` before a call can join an RTC channel. Preserve the callback contracts: the token handler maps a token to an RTC uid, and the mapper resolves RTC uids to IM user ids for the same channel.
 - Add and remove the same `ChatCallKitObserver` instance symmetrically, normally in `initState` and `dispose`.
@@ -94,7 +94,7 @@ This repository is the Easemob source for the overseas CallKit mirror. `scripts/
 - Await operations whose ordering affects state, engine setup, channel membership, or cleanup. Do not silently detach asynchronous lifecycle work.
 - Keep observer iteration tolerant of multiple listeners and prevent duplicate registration where the current API already does so.
 - The root `pubspec.lock` is intentionally untracked for this library package; `example/pubspec.lock` is tracked for reproducible example builds.
-- Android currently uses minSdk 24. The iOS podspec declares iOS 11.0 while the README states iOS 12.0 for the sample environment; if minimum support changes, align the podspec, README, example, and this document.
+- Android currently uses minSdk 24. The IM SDK dependency requires iOS 13.0 or later, as documented in the README. The thin plugin shell's podspec still declares iOS 11.0; this does not lower the SDK requirement. The example targets iOS 15.0.
 
 ## Validation
 

@@ -39,7 +39,7 @@ If your target platform is iOS, your development environment must meet the follo
 - macOS
 - Xcode 12.4 or later with Xcode Command Line Tools
 - CocoaPods
-- An iOS simulator or a real iOS device running iOS 12.0 or later
+- An iOS simulator or a real iOS device running iOS 13.0 or later, as required by the IM SDK
 
 If your target platform is Android, your development environment must meet the following requirements:
 - Flutter 3.3.0 or later
@@ -57,9 +57,14 @@ If your target platform is Android, your development environment must meet the f
 Add the following dependencies in `pubspec.yaml`:
 
 ```sh
+  em_chat_callkit: ^0.1.0
   im_flutter_sdk: ^5.0.0
   agora_rtc_engine: 6.5.1
 ```
+
+### Upgrading to 0.1.0
+
+CallKit 0.1.0 preserves the call-control APIs and uses IM SDK 5.x. When upgrading from 0.0.4 or earlier, replace password login with `ChatCallKitClient.getInstance.loginWithToken(userId, token)`, remove the `autoLogin` option, and explicitly log in on each application start. Applications that display contacts must enable contact data synchronization and use `getAllContacts()` to read the local data. See the [example](example/lib/main.dart) and [CHANGELOG](CHANGELOG.md) for details. Applications already using 0.0.5 can move to 0.1.0 without additional API changes.
 
 ### Add project permissions
 
