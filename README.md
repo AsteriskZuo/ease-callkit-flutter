@@ -41,6 +41,8 @@ If your target platform is iOS, your development environment must meet the follo
 - CocoaPods
 - An iOS simulator or a real iOS device running iOS 13.0 or later, as required by the IM SDK
 
+The iOS plugin also supports Swift Package Manager (SPM) in addition to CocoaPods. When your app builds iOS with SPM enabled, the IM SDK (`ShengwangInfra_iOS`) and the RTC SDK (`AgoraInfra_iOS`) both declare a binary target named `aosl`, and SwiftPM rejects the duplicate. Until the upstream packages disambiguate it, configure a user-level SwiftPM mirror that maps both Infra package URLs to a single clone of `ShengwangInfra_iOS` whose `Package.swift` additionally exposes an `AgoraInfra_iOS` product pointing at the same `aosl` target; write the mirrors to `~/.swiftpm/configuration/mirrors.json` (workspace-level mirror files are not honored by `xcodebuild`).
+
 If your target platform is Android, your development environment must meet the following requirements:
 - Flutter 3.3.0 or later
 - Dart >=3.0.0 <4.0.0
@@ -57,7 +59,7 @@ If your target platform is Android, your development environment must meet the f
 Add the following dependencies in `pubspec.yaml`:
 
 ```sh
-  em_chat_callkit: ^0.1.0
+  em_chat_callkit: ^0.2.0
   im_flutter_sdk: ^5.0.0
   agora_rtc_engine: '>=6.5.1 <6.6.0'
 ```

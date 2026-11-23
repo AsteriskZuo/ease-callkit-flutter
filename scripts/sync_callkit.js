@@ -41,6 +41,7 @@ const REPLACEMENTS = [
   ['EmChatCallkit', 'AgoraChatCallkit'],
   ['emChatCallkit', 'agoraChatCallkit'],
   ['em_chat_callkit', 'agora_chat_callkit'],
+  ['em-chat-callkit', 'agora-chat-callkit'],
   ['im_flutter_sdk', 'agora_chat_sdk'],
 ];
 
@@ -63,7 +64,7 @@ function usage() {
     '  node scripts/sync_callkit.js <source_repo> <target_repo> <target_version> <chat_sdk_version>',
     '',
     'Example:',
-    '  node scripts/sync_callkit.js ../ease-callkit-flutter ../AgoraChat-Callkit-flutter 1.2.3 ^1.2.0',
+    '  node scripts/sync_callkit.js ../em_chat_callkit ../AgoraChat-Callkit-flutter 1.2.3 ^1.2.0',
   ].join('\n');
 }
 

@@ -1,3 +1,7 @@
+## 0.2.0
+- iOS 插件新增 Swift Package Manager 支持：源码迁移至 `ios/em_chat_callkit/Sources/` 布局并新增 `Package.swift`，CocoaPods 集成方式保持不变；
+- iOS 插件壳的 podspec deployment target 由 11.0 调整为 13.0，与 IM SDK 的最低 iOS 要求及 SPM 配置一致。
+
 ## 0.1.0
 - 版本调整：将 0.0.5 的 SDK 5.0 适配以 0.1.0 重新发布，按 Dart/pub 的 0.x 版本约定明确与 0.0.4 及更早版本的集成不兼容边界；相较于 0.0.5，CallKit 公开 API 保持不变；
 - 通话控制接口保持不变，继续依赖 `im_flutter_sdk: ^5.0.0`；将 RTC 依赖范围调整为 `agora_rtc_engine: '>=6.5.1 <6.6.0'`，允许 6.5.x 补丁升级，并排除存在回调签名不兼容的 6.6.x；

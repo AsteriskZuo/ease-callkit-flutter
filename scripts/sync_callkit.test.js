@@ -129,7 +129,8 @@ test('mirrors source into target then applies agora callkit replacements', () =>
       '',
     ].join('\n'),
     'ios/em_chat_callkit.podspec': 's.name = "em_chat_callkit"\n',
-    'ios/Classes/EmChatCallkitPlugin.h': '@interface EmChatCallkitPlugin\n',
+    'ios/em_chat_callkit/Package.swift': 'name: "em_chat_callkit"\nname: "em-chat-callkit"\n',
+    'ios/em_chat_callkit/Sources/em_chat_callkit/include/em_chat_callkit/EmChatCallkitPlugin.h': '@interface EmChatCallkitPlugin\n',
     'lib/em_chat_callkit.dart': 'class EmChatCallkitPlugin {}\nfinal name = "emChatCallkit";\n',
   });
 
@@ -150,7 +151,23 @@ test('mirrors source into target then applies agora callkit replacements', () =>
   assert.equal(fs.existsSync(path.join(target, 'scripts')), false);
   assert.equal(fs.existsSync(path.join(target, 'docs')), false);
   assert.equal(fs.existsSync(path.join(target, 'ios/agora_chat_callkit.podspec')), true);
-  assert.equal(fs.existsSync(path.join(target, 'ios/Classes/AgoraChatCallkitPlugin.h')), true);
+  assert.equal(
+    fs.existsSync(
+      path.join(
+        target,
+        'ios/agora_chat_callkit/Sources/agora_chat_callkit/include/agora_chat_callkit/AgoraChatCallkitPlugin.h',
+      ),
+    ),
+    true,
+  );
+
+  const packageSwift = fs.readFileSync(
+    path.join(target, 'ios/agora_chat_callkit/Package.swift'),
+    'utf8',
+  );
+  assert.match(packageSwift, /agora_chat_callkit/);
+  assert.match(packageSwift, /agora-chat-callkit/);
+  assert.doesNotMatch(packageSwift, /em_chat_callkit|em-chat-callkit/);
 
   const pubspec = fs.readFileSync(path.join(target, 'pubspec.yaml'), 'utf8');
   assert.match(pubspec, /^name: agora_chat_callkit$/m);
