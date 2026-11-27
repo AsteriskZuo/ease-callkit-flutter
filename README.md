@@ -477,21 +477,3 @@ class Config {
 ```
 
 To obtain the Agora RTC token, you need to set up an [App Server](./authentication#Deploy an app server to generate tokens) and provide a mapping service for the agora user ID and the Agora Chat user ID.
-
-## Local development
-
-To test against a local checkout of the Chat SDK, create a `pubspec_overrides.yaml` file in both the package root and `example/`:
-
-```yaml
-dependency_overrides:
-  im_flutter_sdk:
-    path: /path/to/im_flutter_sdk
-  im_flutter_sdk_android:
-    path: /path/to/im_flutter_sdk/im_flutter_sdk_android
-  im_flutter_sdk_ios:
-    path: /path/to/im_flutter_sdk/im_flutter_sdk_ios
-  im_flutter_sdk_interface:
-    path: /path/to/im_flutter_sdk/im_flutter_sdk_interface
-```
-
-Do not commit `pubspec_overrides.yaml`, nor any `pubspec.lock` generated while it is present (such a lock file contains local paths).
