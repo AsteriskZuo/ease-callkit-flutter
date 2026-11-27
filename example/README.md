@@ -1,16 +1,23 @@
-# em_chat_callkit_example
+# example
 
-Demonstrates how to use the em_chat_callkit plugin.
+A runnable integration example for CallKit: login, RTC token callback, user
+mapping, and the call UI.
 
-## Getting Started
+To run it, fill in `lib/config.dart` with your own values:
 
-This project is a starting point for a Flutter application.
+```dart
+class Config {
+  static String agoraAppId = "";
+  static String appkey = "";
+  static String appServerDomain = "";
+  static String appServerRTCTokenURL = "";
+  static String appServerUserMapperURL = "";
+}
+```
 
-A few resources to get you started if this is your first Flutter project:
+- `appkey`: Your Chat App Key.
+- `agoraAppId`: Your Agora RTC App ID.
+- `appServerRTCTokenURL` / `appServerUserMapperURL`: Your app server endpoints
+  that issue RTC tokens and map RTC UIDs to Chat user IDs.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Then run `flutter run` from this directory.

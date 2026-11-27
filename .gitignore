@@ -174,3 +174,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,flutter
 
 .vscode/
+pubspec_overrides.yaml
+pubspec_overrides.yaml.bk
+**/ios/**/swiftpm/

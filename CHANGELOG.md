@@ -1,47 +1,47 @@
 ## 0.2.0
-- iOS 插件新增 Swift Package Manager 支持：源码迁移至 `ios/em_chat_callkit/Sources/` 布局并新增 `Package.swift`，CocoaPods 集成方式保持不变；
-- iOS 插件壳的 podspec deployment target 由 11.0 调整为 13.0，与 IM SDK 的最低 iOS 要求及 SPM 配置一致。
+- iOS: Add Swift Package Manager support: the plugin source moves to the SPM `Sources/` layout with a new `Package.swift`; CocoaPods integration is unchanged.
+- iOS: Raise the plugin shell podspec deployment target from 11.0 to 13.0, aligning with the minimum iOS requirement of the Chat SDK and the SPM configuration.
 
 ## 0.1.0
-- 版本调整：将 0.0.5 的 SDK 5.0 适配以 0.1.0 重新发布，按 Dart/pub 的 0.x 版本约定明确与 0.0.4 及更早版本的集成不兼容边界；相较于 0.0.5，CallKit 公开 API 保持不变；
-- 通话控制接口保持不变，继续依赖 `im_flutter_sdk: ^5.0.0`；将 RTC 依赖范围调整为 `agora_rtc_engine: '>=6.5.1 <6.6.0'`，允许 6.5.x 补丁升级，并排除存在回调签名不兼容的 6.6.x；
-- 示例：修复 iOS AOSL 去重后残留链接参数导致的 `Framework 'aosl' not found` 错误，继续保留较高版本的 AOSL；
-- 从 0.0.4 及更早版本迁移：通过公开 SDK 类型调用的密码登录和 `autoLogin` 已移除，应用每次启动时需显式使用 Token 登录；
-- 从 0.0.4 及更早版本迁移：使用联系人列表的应用需启用联系人数据同步，并改用 `getAllContacts()` 读取本地数据，示例见 `example/`；
-- 文档：将 README 中的最低 iOS 版本修正为 13.0，与 SDK 要求一致。
-- 打包：将 `pubspec.lock` 忽略规则限定为库根目录，保留 example 锁文件的追踪和打包。
+- Versioning: Re-release the 0.0.5 Chat SDK 5.0 adaptation as 0.1.0 to mark the integration break from 0.0.4 and earlier, per Dart/pub 0.x conventions; the public CallKit API is unchanged from 0.0.5.
+- Dependencies: Continue to depend on the Chat SDK `^5.0.0`; constrain the RTC dependency to `agora_rtc_engine '>=6.5.1 <6.6.0'` to allow 6.5.x patch upgrades and exclude 6.6.x, which has incompatible callback signatures.
+- Example: Fix the `Framework 'aosl' not found` error caused by leftover link parameters after iOS AOSL deduplication; keep the higher-versioned AOSL.
+- Migration from 0.0.4 and earlier: Password login and `autoLogin` via the public SDK types have been removed; the app must log in explicitly with a token on every start.
+- Migration from 0.0.4 and earlier: Applications that display contacts must enable contact data synchronization and read local data with `getAllContacts()`; see `example/`.
+- Docs: Correct the minimum iOS version in the README to 13.0, matching the SDK requirement.
+- Packaging: Scope the `pubspec.lock` ignore rule to the library root; keep tracking and packaging the example lock file.
 
-## 0.0.5（已撤回，由 0.1.0 替代）
-- 升级依赖 `im_flutter_sdk` 为 `^5.0.0`，同步更新 iOS `HyphenateChat` 至 5.0.0；
-- 适配 5.0.0 仅支持 Token 登录的变更：示例工程改为每次手动 Token 登录，并移除自动登录、密码登录及旧注册换 Token 流程；
-- 适配 5.0.0 联系人本地数据 API：启用会话和联系人数据同步，使用 `getAllContacts()` 获取联系人；
-- 更新 README 中的依赖版本与示例配置。
+## 0.0.5 (Retracted; superseded by 0.1.0)
+- Upgrade the Chat SDK dependency to `^5.0.0`; sync iOS `HyphenateChat` to 5.0.0.
+- Adapt to token-only login in 5.0.0: the example now logs in manually with a token on each start; automatic login, password login, and the old register-for-token flow are removed.
+- Adapt to the 5.0.0 contact local-data APIs: enable conversation and contact data synchronization and use `getAllContacts()`.
+- Docs: Update dependency versions and example configuration in the README.
 
 ## 0.0.4
-- 升级 依赖 im_flutter_sdk 为 ^4.25.0；
-- 撤销 0.0.3 开始追踪根目录 pubspec.lock 的做法：根目录 pubspec.lock 退出 git 追踪（本地文件保留），遵循 Dart 库包不提交 pubspec.lock 的约定；
-- 示例工程 example/pubspec.lock 仍保持 git 追踪。
+- Upgrade the Chat SDK dependency to `^4.25.0`.
+- Revert tracking the root `pubspec.lock` (started in 0.0.3): the root lock file leaves git tracking (the local file is kept), following the Dart convention that library packages do not commit `pubspec.lock`.
+- The example project `example/pubspec.lock` remains tracked.
 
 ## 0.0.3
-- 升级 依赖 im_flutter_sdk 为 ^4.22.0；
-- 升级 example 的 Android 构建工具链以适配 Flutter 3.47（Gradle 8.14.3 / AGP 8.13.0 / KGP 2.3.0），仅示例工程构建配置；
-- 开始追踪根目录 pubspec.lock，保证长期搁置后依赖可复现、可构建。
+- Upgrade the Chat SDK dependency to `^4.22.0`.
+- Upgrade the example Android build toolchain for Flutter 3.47 (Gradle 8.14.3 / AGP 8.13.0 / KGP 2.3.0); example build configuration only.
+- Start tracking the root `pubspec.lock` so dependencies stay reproducible after long idle periods.
 
 ## 0.0.2-beta.1
-- 更新版本为0.0.2-beta.1
-- 调整初始化RTC engine部分逻辑, 增加初始化部分log记录
-- 调整RTC log存放目录
+- Bump the version to 0.0.2-beta.1.
+- Adjust the RTC engine initialization logic and add initialization logging.
+- Adjust the RTC log storage directory.
 
 ## 0.0.2+2
-- 更新版本为0.0.2+2
+- Bump the version to 0.0.2+2.
 
 ## 0.0.2+1
-- 使用im_flutter_sdk及其依赖插件固定版本为4.15.2
+- Pin the Chat SDK and its dependent plugins to 4.15.2.
 
 ## 0.0.2
-- 使用im_flutter_sdk及其依赖插件固定版本为4.13.0+1
-- 添加日志写入文件功能, 开关日志功能请设置 `chat_callkit_tools.dart` 中的 `enableLog`
+- Pin the Chat SDK and its dependent plugins to 4.13.0+1.
+- Add file logging; toggle it via `enableLog` in `chat_callkit_tools.dart`.
 
 ## 0.0.1
 
-* 初次发版
+* Initial release.

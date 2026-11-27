@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/easemob/HyphenateChat_iOS.git",
       "state" : {
-        "revision" : "2aacd520c3890e3b09d949ace6711db41f11931d",
-        "version" : "5.1.0"
+        "revision" : "27af80f00faa7661412ecfaf2e23395772c5e6c8",
+        "version" : "5.2.0"
       }
     },
     {

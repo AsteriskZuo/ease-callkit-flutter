@@ -45,7 +45,6 @@ This file is versioned operating documentation. Whenever the package version or 
 | `lib/inherited/widgets/chat_callkit.dart` | Configures the RTC App ID and call timeout from the widget tree |
 | `example/` | Runnable integration example for login, token callbacks, user mapping, and call UI |
 | `android/`, `ios/` | Flutter plugin shells and platform deployment configuration; call behavior remains in Dart |
-| `scripts/` | Domestic-to-overseas CallKit synchronization tool and its Node test suite |
 
 The main runtime flow is:
 
@@ -81,12 +80,10 @@ An application initializes the IM client, places `ChatCallKit` above call UI, re
 
 ## Cross-Repository Synchronization
 
-This repository is the Easemob source for the overseas CallKit mirror. `scripts/sync_callkit.js` mirrors the source tree and applies package, SDK, plugin-class, path, homepage, and license replacements for the Agora repository.
+This repository is the domestic source for the overseas CallKit mirror. The parent workspace's `scripts/migrate-callkit-to-agora.sh` performs the controlled source-to-overseas conversion (whole-tree overwrite plus package-name replacement, with a git-tracked mapping report in the workspace).
 
-- Keep Easemob names in this source repository; let the synchronization script produce Agora-specific names in the target repository.
-- Keep replacement-sensitive names and `call_define.dart` handling covered by `scripts/sync_callkit.test.js`.
-- The synchronization command requires a clean source repository and no tracked changes in the target repository. Run it only as part of an explicit synchronization task because it cleans and replaces the target contents.
-- Run `node --test scripts/sync_callkit.test.js` after changing synchronization behavior or replacement-sensitive package structure.
+- Keep native plugin identifiers stable (`EmChatCallkitPlugin`, `com.example.em_chat_callkit`); do not rename them in this repository. The migration script mechanically renames them to the overseas naming (`AgoraChatCallkitPlugin`, `com.example.agora_chat_callkit`, including java/SPM/kotlin source directories and the iOS bundle identifier) in the target repository. Keep SDK naming isolated in `call_define.dart` so the synchronization remains mechanical.
+- When synchronization is in scope, follow the parent workspace guide and run its completeness checks and example builds; do not manually maintain a second implementation in the overseas repository.
 
 ## Code And Repository Conventions
 

@@ -1,10 +1,10 @@
 # Get Started with Agora Chat CallKit for Flutter
 
-`em_chat_callkit` is a video and audio component library built on top of `im_flutter_sdk` and `agora_rtc_engine`. It provides logical modules for making and receiving calls, including one-to-one voice calls, one-to-one video calls, group audio calls, and group video calls. It uses `em_chat_callkit` to handle call invitations and negotiations. After negotiations are complete, the `ChatCallKitManager.setRTCTokenHandler` callback is triggered, and the Agora RTC token needs to be returned. The Agora RTC token must be provided by the developer.
+CallKit is a video and audio component library built on top of the Chat SDK and `agora_rtc_engine`. It provides logical modules for making and receiving calls, including one-to-one voice calls, one-to-one video calls, group audio calls, and group video calls. It uses CallKit to handle call invitations and negotiations. After negotiations are complete, the `ChatCallKitManager.setRTCTokenHandler` callback is triggered, and the Agora RTC token needs to be returned. The Agora RTC token must be provided by the developer.
 
 ## Understand the tech
 
-For a call, the call invitation is implemented via Agora Chat, while the call is made through Agora RTC. As the accounts of Agora RTC and Agora Chat are not globally recognizable at present, the accounts need to be mapped via the `ChatCallKitManager.setUserMapperHandler` callback in `em_chat_callkit`. When a user joins the call, the Agora RTC user ID (UID) will be returned via the callback. After you get the corresponding Agora Chat user ID, you need to return it to `em_chat_callkit`. If there is no mapping between the two user IDs, the call will not proceed properly. See `ChatCallKitUserMapper`.
+For a call, the call invitation is implemented via Agora Chat, while the call is made through Agora RTC. As the accounts of Agora RTC and Agora Chat are not globally recognizable at present, the accounts need to be mapped via the `ChatCallKitManager.setUserMapperHandler` callback in CallKit. When a user joins the call, the Agora RTC user ID (UID) will be returned via the callback. After you get the corresponding Agora Chat user ID, you need to return it to CallKit. If there is no mapping between the two user IDs, the call will not proceed properly. See `ChatCallKitUserMapper`.
 
 This section describes how to implement a one-to-one call or group call.
 
@@ -56,17 +56,17 @@ If your target platform is Android, your development environment must meet the f
 
 ### Add the dependencies
 
-Add the following dependencies in `pubspec.yaml`:
+Add the following dependencies:
 
 ```sh
-  em_chat_callkit: ^0.2.0
-  im_flutter_sdk: ^5.0.0
-  agora_rtc_engine: '>=6.5.1 <6.6.0'
+flutter pub add em_chat_callkit im_flutter_sdk agora_rtc_engine
 ```
 
-### Upgrading to 0.1.0
+Pin `agora_rtc_engine` to `>=6.5.1 <6.6.0` in `pubspec.yaml` (6.6.x has incompatible callback signatures).
 
-CallKit 0.1.0 preserves the call-control APIs and uses IM SDK 5.x. When upgrading from 0.0.4 or earlier, replace password login with `ChatCallKitClient.getInstance.loginWithToken(userId, token)`, remove the `autoLogin` option, and explicitly log in on each application start. Applications that display contacts must enable contact data synchronization and use `getAllContacts()` to read the local data. See the [example](example/lib/main.dart) and [CHANGELOG](CHANGELOG.md) for details. Applications already using 0.0.5 can move to 0.1.0 without additional API changes.
+### Upgrading from 0.0.4 or earlier
+
+The call-control APIs are preserved. When upgrading from 0.0.4 or earlier, replace password login with `ChatCallKitClient.getInstance.loginWithToken(userId, token)`, remove the `autoLogin` option, and explicitly log in on each application start. Applications that display contacts must enable contact data synchronization and use `getAllContacts()` to read the local data. See the [example](example/lib/main.dart) and [CHANGELOG](CHANGELOG.md) for details.
 
 ### Add project permissions
 
@@ -142,7 +142,7 @@ class MyApp extends StatelessWidget {
 
 ### Add the Agora token callback
 
-Agora RTC needs a token and a channel ID to join a channel. Therefore, the two parameters are required when `em_chat_callkit` is used. `em_chat_callkit` gets the two parameters from the `ChatCallKitManager.setRTCTokenHandler` callback.
+Agora RTC needs a token and a channel ID to join a channel. Therefore, the two parameters are required when CallKit is used. CallKit gets the two parameters from the `ChatCallKitManager.setRTCTokenHandler` callback.
 
 ```
 // channel: The channel to join.
@@ -437,7 +437,7 @@ Once push notifications are enabled, when a call invitation arrives, a notificat
 
 This section provides other reference information that you can refer to when implementing real-time audio and video communications functionalities.
 
-In `agora_chat_callkit`, `ChatCallKitManager` provides the following APIs:
+In CallKit, `ChatCallKitManager` provides the following APIs:
 
 |  Method          | Description              |
 | :-------------------------- | :------------------ |
